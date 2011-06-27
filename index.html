@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>CSS Beautifier (by Sencha)</title>
+    <script src="cssbeautify.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+    var formatId;
+    function format() {
+        if (formatId) {
+            window.clearTimeout(formatId);
+        }
+        formatId = window.setTimeout(function () {
+            var raw, beautified;
+            raw = document.getElementById('raw').value;
+            beautified = cssbeautify(raw);
+            document.getElementById('beautified').value = beautified;
+            formatId = undefined;
+        }, 42);
+    }
+    </script>
+<style>
+#raw {
+    margin: 5px;
+}
+
+#beautified {
+    color: black;
+    background-color: #ddd;
+}
+
+textarea {
+    font-family: Monaco, Consolas, "Lucida Console", monospace;
+}
+</style>
+</head>
+<body>
+    <p>Type any unformatted CSS:</p>
+    <p><textarea id="raw" cols="80" rows="15" spellcheck="false" onChange='format()' onKeyDown='format()'>menu{color:red} navigation{background-color:#333}</textarea></p>
+    <p>Beautified CSS:</p>
+    <p><textarea id="beautified" cols="80" rows="15" readonly></textarea></p>
+    <script>format();</script>
+    <p>Formatting rules:</p>
+    <ul>
+        <li>Comments are preserved</li>
+        <li>Only one blank line between two rulesets</li>
+        <li>Open curly brace is at the end of line, preceded by a space</li>
+        <li>Closed curly brace is at its own line</li>
+        <li>Each declaration inside the ruleset is indented with 4 spaces</li>
+        <li>There is no empty line between declarations inside a ruleset</li>
+        <li>Between property name and value, no space before colon and only one space after colon</li>
+    </ul>
+    <p>Not handled yet</p>
+    <ul>
+        <li>Directives such as @import, @media, etc</li>
+        <li>Optionally separate each selector and put it in its own line</li>
+        <li>Custom indentation (n spaces or n tabs)</li>
+    </ul>
+</body>
+
+</html>
