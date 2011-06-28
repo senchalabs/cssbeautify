@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Unit tests for CSS Beautifier</title>
+<style>
+.name {
+    color: red;
+}
+
+pre {
+    margin-left: 20px;
+    padding: 5px;
+    display: block;
+    width: 400px;
+}
+
+.source {
+    background-color: #ddd;
+}
+
+.ref {
+    border: 1px solid blue;
+}
+
+.result {
+    border: 1px solid red;
+}
+</style>
+<script src="cssbeautify.js" type="text/javascript" charset="utf-8"></script>
+
+<!--
+Every test data consists of a pair of styles with matching ids.
+The baseline/reference should have -ref suffix.
+-->
+
+<style id="simple">menu{color:red}</style>
+
+<style id="simple-ref">
+menu {
+    color: red
+}
+</style>
+
+</head>
+<body>
+<script>
+var total = 0, failures = 0, data = {},
+    list, i, e, id, name, test;
+
+// Convert into a set of test fixture.
+list = document.getElementsByTagName('style');
+for (i = 0; i < list.length; i += 1) {
+    e = list[i];
+    id = e.id;
+    if (typeof id === 'string' && id.length > 0) {
+        if (id.match(/\-ref$/)) {
+          id = id.substring(0, id.length - 4);
+          data[id] = data[id] || {};
+          data[id].ref = e.innerHTML.replace(/^\s+/, '').replace(/\s+$/, '');
+        } else {
+          data[id] = data[id] || {};
+          data[id].source = e.innerHTML;
+        }
+    }
+}
+
+// Go through all the fixture and create the formatted version.
+for (name in data) {
+    if (data.hasOwnProperty(name)) {
+        total += 1;
+        test = data[name];
+        test.result = cssbeautify(test.source);
+        if (test.result !== test.ref) {
+            failures += 1;
+            document.write('<p class="name">Failed: ' + name + '</p>');
+            document.write('<p>Raw CSS:</p>');
+            document.write('<pre class="source">' + test.source + '</pre>');
+            document.write('<p>Expected baseline:</p>');
+            document.write('<pre class="ref">' + test.ref + '</pre>');
+            document.write('<p>Actual:</p>');
+            document.write('<pre class="result">' + test.result + '</pre>');
+        }
+    }
+}
+
+document.write('<p>' + total + ' tests, ' + failures + ' failure(s).</p>');
+</script>
+</body>
+</html>
