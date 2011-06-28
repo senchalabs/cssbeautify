@@ -22,8 +22,12 @@
  THE SOFTWARE.
 */
 
-function cssbeautify(style) {
+function cssbeautify(style, options) {
     "use strict";
+    var indentation = '    ';
+    if (options && options.indentation == 'tab') {
+        indentation = '\t';
+    }
     var index = 0, length = style.length, formatted = '',
         ch, ch2, str, state, State,
         trimRight;
@@ -155,7 +159,7 @@ function cssbeautify(style) {
             if (!isWhitespace(ch)) {
                 formatted = trimRight(formatted);
                 formatted += '\n';
-                formatted += '    ';
+                formatted += indentation;
                 formatted += ch;
                 state = State.PropertyName;
                 continue;
