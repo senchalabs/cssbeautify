@@ -57,7 +57,9 @@ function cssbeautify(style, opt) {
         Ruleset: 3,
         PropertyName: 4,
         Separator: 5,
-        PropertyValue: 6
+        PropertyValue: 6,
+        SingleQuotedString: 7,
+        DoubleQuotedString: 8
     };
     state = State.Start;
 
@@ -193,13 +195,30 @@ function cssbeautify(style, opt) {
         if (state === State.Separator) {
             if (!isWhitespace(ch)) {
                 formatted += ch;
+                if (ch === '\'') {
+                    state = State.SingleQuotedString;
+                    continue;
+                } else if (ch === '"') {
+                    state = State.DoubleQuotedString;
+                    continue;
+                }
                 state = State.PropertyValue;
+                continue;
             }
             continue;
         }
 
-        // TODO: handle string etc
         if (state === State.PropertyValue) {
+            if (ch === '\'') {
+                formatted += ch;
+                state = State.SingleQuotedString;
+                continue;
+            }
+            if (ch === '"') {
+                formatted += ch;
+                state = State.DoubleQuotedString;
+                continue;
+            }
             // Continue until we hit ';''
             if (ch === ';') {
                 formatted = trimRight(formatted);
@@ -217,6 +236,31 @@ function cssbeautify(style, opt) {
             formatted += ch;
             continue;
         }
+
+        // TODO: fully implement http://www.w3.org/TR/CSS2/syndata.html#strings
+        if (state === State.SingleQuotedString) {
+            // Continue until we hit another single quote
+            if (ch === '\'') {
+                state = State.PropertyValue;
+                formatted += ch;
+                continue;
+            }
+            formatted += ch;
+            continue;
+        }
+
+        // TODO: fully implement http://www.w3.org/TR/CSS2/syndata.html#strings
+        if (state === State.DoubleQuotedString) {
+            // Continue until we hit another double quote
+            if (ch === '"') {
+                state = State.PropertyValue;
+                formatted += ch;
+                continue;
+            }
+            formatted += ch;
+            continue;
+        }
+
 
         // The default action is to copy the character (to prevent
         // infinite loop).
