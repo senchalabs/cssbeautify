@@ -5,31 +5,22 @@
     <title>CSS Beautifier (by Sencha)</title>
     <script src="cssbeautify.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript">
-    function getUrlParameter(name) {
-        var regexS = '[\\?&]' + name + '=([^&#]*)';
-        var regex = new RegExp(regexS);
-        var results = regex.exec(window.location.href);
-        if (results == null) {
-            return null;
-        } else {
-            return results[1];
-        }
-    }
-
-    var options = {};
-    options.indentation = '4spaces';
-    var urlParameterIndentation = getUrlParameter('indentation');
-    if (urlParameterIndentation != null) {
-        options.indentation = urlParameterIndentation;
-    }
-
     var formatId;
     function format() {
         if (formatId) {
             window.clearTimeout(formatId);
         }
         formatId = window.setTimeout(function () {
-            var raw, beautified;
+            var options, raw, beautified;
+
+            options = {
+                indent: '    '
+            };
+
+            if (document.getElementById('tab').checked) {
+                options.indent = '\t';
+            }
+
             raw = document.getElementById('raw').value;
             beautified = cssbeautify(raw, options);
             document.getElementById('beautified').value = beautified;
@@ -65,6 +56,10 @@ textarea {
     width: 40%;
     padding-top: 50px;
     padding-right: 20px;
+  }
+
+input {
+    margin-left: 20px;
 }
 </style>
 </head>
@@ -86,8 +81,14 @@ textarea {
         <li>Each declaration inside the ruleset is indented with 4 spaces</li>
         <li>There is no empty line between declarations inside a ruleset</li>
         <li>Between property name and value, no space before colon and only one space after colon</li>
-        <li>Your indentations may be <a href=index.html?indentation=tab>tabs</a> or <a href=index.html?indentation=4spaces>4 spaces</a></li>
     </ul>
+    <p>Options (more coming soon):</p>
+    <div style="border: 1px solid #ddd; padding-left: 5px">
+    <p>Indent with<br>
+    <input checked type="radio" name="indent" id="spaces" value="spaces" onChange='format()'>spaces<br>
+    <input type="radio" name="indent" id="tab" value="tab" onChange='format()'>tab
+    </p>
+    </div>
     <p>Not handled yet</p>
     <ul>
         <li>Directives such as @import, @media, etc</li>
