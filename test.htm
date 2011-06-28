@@ -12,7 +12,7 @@ pre {
     margin-left: 20px;
     padding: 5px;
     display: block;
-    width: 400px;
+    width: 500px;
 }
 
 .source {
@@ -34,11 +34,161 @@ Every test data consists of a pair of styles with matching ids.
 The baseline/reference should have -ref suffix.
 -->
 
-<style id="simple">menu{color:red}</style>
+<style id="simple">
+menu { color: blue; }
+
+box { border-radius: 4px; background-color: red }
+
+a { color: green }
+b { color: red }
+</style>
 
 <style id="simple-ref">
 menu {
+    color: blue;
+}
+
+box {
+    border-radius: 4px;
+    background-color: red
+}
+
+a {
+    color: green
+}
+
+b {
     color: red
+}
+</style>
+
+<style id="comment">
+/* line comment */
+navigation { color: blue }
+
+menu {
+    /* line comment inside */
+    border: 2px
+}
+
+/* block
+ comment */
+sidebar { color: red }
+
+invisible {
+    /* block
+     * comment
+     * inside */
+    color: #eee
+}
+</style>
+
+<style id="comment-ref">
+/* line comment */
+navigation {
+    color: blue
+}
+
+menu {
+    /* line comment inside */
+    border: 2px
+}
+
+/* block
+ comment */
+sidebar {
+    color: red
+}
+
+invisible {
+    /* block
+     * comment
+     * inside */
+    color: #eee
+}
+</style>
+
+<!-- wrong indentation should be corrected -->
+<style id="indent">
+     navigation {
+    color: blue
+  }
+</style>
+<style id="indent-ref">
+navigation {
+    color: blue
+}
+</style>
+
+<!-- test various whitespaces placement and elimination -->
+<style id="spaces">
+/* only one blank line between */
+menu { color: red }
+
+
+
+
+navi { color: black }
+
+/* automatically insert a blank line */
+button { border: 1px } sidebar { color: #ffe }
+
+/* always whitespace before { */
+hidden{opacity:0%}
+
+/* no blank lines inside ruleset */
+imprint {
+  color: blue;
+
+
+    opacity: 0.5;
+
+   font-size: small
+}
+
+/* before colon: no space, after colon: one space only */
+footer {
+      font-family:     Arial;
+
+  float   :right;
+  }
+</style>
+
+<style id="spaces-ref">
+/* only one blank line between */
+menu {
+    color: red
+}
+
+navi {
+    color: black
+}
+
+/* automatically insert a blank line */
+button {
+    border: 1px
+}
+
+sidebar {
+    color: #ffe
+}
+
+/* always whitespace before { */
+hidden {
+    opacity: 0%
+}
+
+/* no blank lines inside ruleset */
+imprint {
+    color: blue;
+    opacity: 0.5;
+    font-size: small
+}
+
+/* before colon: no space, after colon: one space only */
+footer {
+    font-family: Arial;
+    float: right;
 }
 </style>
 
@@ -70,7 +220,7 @@ for (name in data) {
     if (data.hasOwnProperty(name)) {
         total += 1;
         test = data[name];
-        test.result = cssbeautify(test.source);
+        test.result = cssbeautify(test.source).replace(/^\s+/, '').replace(/\s+$/, '');
         if (test.result !== test.ref) {
             failures += 1;
             document.write('<p class="name">Failed: ' + name + '</p>');
