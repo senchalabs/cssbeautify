@@ -30,7 +30,7 @@ function cssbeautify(style, options) {
         ch, ch2, str, state, State, indentation = '    ',
         trimRight;
 
-    if (options && options.indentation == 'tab') {
+    if (options && options.indentation === 'tab') {
         indentation = '\t';
     }
 
