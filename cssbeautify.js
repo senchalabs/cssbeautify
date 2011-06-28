@@ -22,6 +22,8 @@
  THE SOFTWARE.
 */
 
+/*jslint continue: true, indent: 4 */
+
 function cssbeautify(style, options) {
     "use strict";
     var indentation = '    ';
