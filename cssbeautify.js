@@ -25,7 +25,7 @@
 function cssbeautify(style, options) {
     "use strict";
     var indentation = '    ';
-    if (options && options.indentation=='tab') {
+    if (options && options.indentation == 'tab') {
 		indentation = '\t';
 	}
     var index = 0, length = style.length, formatted = '',
