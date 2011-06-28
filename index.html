@@ -5,6 +5,20 @@
     <title>CSS Beautifier (by Sencha)</title>
     <script src="cssbeautify.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript">
+	function getUrlParameter(name) {
+		name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+		var regexS = "[\\?&]"+name+"=([^&#]*)";
+		var regex = new RegExp( regexS );
+		var results = regex.exec( window.location.href );
+		if( results == null ) return null;
+		else return results[1];
+	}
+	var options = {};
+	options.indentation = '4spaces';
+	var urlParameterIndentation = getUrlParameter('indentation');
+	if (urlParameterIndentation!=null) {
+		options.indentation = urlParameterIndentation;
+	}
     var formatId;
     function format() {
         if (formatId) {
@@ -13,7 +27,7 @@
         formatId = window.setTimeout(function () {
             var raw, beautified;
             raw = document.getElementById('raw').value;
-            beautified = cssbeautify(raw);
+            beautified = cssbeautify(raw, options);
             document.getElementById('beautified').value = beautified;
             formatId = undefined;
         }, 42);
@@ -68,12 +82,12 @@ textarea {
         <li>Each declaration inside the ruleset is indented with 4 spaces</li>
         <li>There is no empty line between declarations inside a ruleset</li>
         <li>Between property name and value, no space before colon and only one space after colon</li>
+        <li>Your indentations may be <a href=index.html?indentation=tab>tabs</a> or <a href=index.html?indentation=4spaces>spaces</a></li>
     </ul>
     <p>Not handled yet</p>
     <ul>
         <li>Directives such as @import, @media, etc</li>
         <li>Optionally separate each selector and put it in its own line</li>
-        <li>Custom indentation (n spaces or n tabs)</li>
     </ul>
   </div>
   <p><a href="http://github.com/senchalabs/cssbeautify"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://d3nwyuy0nl342s.cloudfront.net/img/abad93f42020b733148435e2cd92ce15c542d320/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub"></a></p>
