@@ -192,6 +192,22 @@ footer {
 }
 </style>
 
+<!-- String inside the property value should be taken into account -->
+<style id="string">
+nav:after{content:'}'}
+nav:before{content:"}"}
+</style>
+
+<style id="string-ref">
+nav:after {
+    content: '}'
+}
+
+nav:before {
+    content: "}"
+}
+</style>
+
 </head>
 <body>
 <script>
