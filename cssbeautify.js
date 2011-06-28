@@ -24,14 +24,15 @@
 
 /*jslint continue: true, indent: 4 */
 
-function cssbeautify(style, options) {
+function cssbeautify(style, opt) {
     "use strict";
-    var index = 0, length = style.length, formatted = '',
-        ch, ch2, str, state, State, indentation = '    ',
+    var options, index = 0, length = style.length, formatted = '',
+        ch, ch2, str, state, State,
         trimRight;
 
-    if (options && options.indentation === 'tab') {
-        indentation = '\t';
+    options = arguments.length > 1 ? opt : {};
+    if (typeof options.indent === 'undefined') {
+        options.indent = '    ';
     }
 
     function isWhitespace(c) {
@@ -161,7 +162,7 @@ function cssbeautify(style, options) {
             if (!isWhitespace(ch)) {
                 formatted = trimRight(formatted);
                 formatted += '\n';
-                formatted += indentation;
+                formatted += options.indent;
                 formatted += ch;
                 state = State.PropertyName;
                 continue;
