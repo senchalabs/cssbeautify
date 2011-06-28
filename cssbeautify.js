@@ -26,13 +26,13 @@
 
 function cssbeautify(style, options) {
     "use strict";
-    var indentation = '    ';
+    var index = 0, length = style.length, formatted = '',
+        ch, ch2, str, state, State, indentation = '    ',
+        trimRight;
+
     if (options && options.indentation == 'tab') {
         indentation = '\t';
     }
-    var index = 0, length = style.length, formatted = '',
-        ch, ch2, str, state, State,
-        trimRight;
 
     function isWhitespace(c) {
         return ' \t\n\r\f'.indexOf(c) >= 0;
