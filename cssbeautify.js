@@ -28,11 +28,15 @@ function cssbeautify(style, opt) {
     "use strict";
     var options, index = 0, length = style.length, formatted = '',
         ch, ch2, str, state, State,
+        openbrace = ' {',
         trimRight;
 
     options = arguments.length > 1 ? opt : {};
     if (typeof options.indent === 'undefined') {
         options.indent = '    ';
+    }
+    if (typeof options.openbrace === 'string') {
+        openbrace = (options.openbrace === 'end-of-line') ? ' {' : '\n{';
     }
 
     function isWhitespace(c) {
@@ -135,7 +139,7 @@ function cssbeautify(style, opt) {
             // Continue until we hit '{'
             if (ch === '{') {
                 formatted = trimRight(formatted);
-                formatted += ' {';
+                formatted += openbrace;
                 if (ch2 !== '\n') {
                     formatted += '\n';
                 }
