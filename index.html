@@ -21,6 +21,10 @@
                 options.indent = '\t';
             }
 
+            if (document.getElementById('openbrace-separate-line').checked) {
+                options.openbrace = 'separate-line';
+            }
+
             raw = document.getElementById('raw').value;
             beautified = cssbeautify(raw, options);
             document.getElementById('beautified').value = beautified;
@@ -76,7 +80,6 @@ input {
     <ul>
         <li>Comments are preserved</li>
         <li>Only one blank line between two rulesets</li>
-        <li>Open curly brace is at the end of line, preceded by a space</li>
         <li>Closed curly brace is at its own line</li>
         <li>There is no empty line between declarations inside a ruleset</li>
         <li>Between property name and value, no space before colon and only one space after colon</li>
@@ -86,6 +89,9 @@ input {
     <p>Indent with<br>
     <input checked type="radio" name="indent" id="spaces" value="spaces" onChange='format()'>spaces<br>
     <input type="radio" name="indent" id="tab" value="tab" onChange='format()'>tab
+    <p>Place open curly brace<br>
+    <input checked type="radio" name="openbrace" id="openbrace-end-of-line" onChange='format()'>at the end-of-line<br>
+    <input type="radio" name="openbrace" id="openbrace-separate-line" onChange='format()'>in a separate line
     </p>
     </div>
     <p>Not handled yet</p>
