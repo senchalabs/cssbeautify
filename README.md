@@ -19,6 +19,26 @@ CSS Beautify will produce:
 
 Try it online at [http://senchalabs.github.com/cssbeautify](http://senchalabs.github.com/cssbeautify).
 
+## Using cssbeautify() function ##
+
+Since CSS Beautify is written in pure JavaScript, it can run anywhere that JavaScript can run.
+
+The API is very simple:
+
+    var result = cssbeautify(style, options);
+
+**options** is an optional object to adjust the formatting. Known options so far are:
+
+  *  <code>indent</code> is a string used for the indentation of the declaration (default is 4 spaces)
+  *  <code>openbrace</code> defines the placement of open curly brace, either *end-of-line* (default) or *separate-line*.
+
+Example call:
+
+    var beautified = cssbeautify('menu{opacity:.7}', {
+        indent: '  ',
+        openbrace: 'separate-line'
+    });
+
 ## Contributing ##
 
 Before we can accept any contributions, you need to sign [Contributor License Agreement](http://en.wikipedia.org/wiki/Contributor_License_Agreement). We are preparing the CLA and it should be available soon.
