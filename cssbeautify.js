@@ -99,6 +99,8 @@ function cssbeautify(style, opt) {
                     (ch >= 'A' && ch <= 'Z') ||
                     (ch >= '0' && ch <= '9') ||
                     (ch === '-') || (ch === '_') ||
+                    (ch === '-') || (ch === '_') ||
+                    (ch === '*') ||
                     (ch === '.') || (ch === ':')) {
 
                 // Clear trailing whitespaces and linefeeds.
