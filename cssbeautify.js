@@ -58,12 +58,13 @@ function cssbeautify(style, opt) {
         Start: 0,
         BlockComment: 1,
         Selectors: 2,
-        Ruleset: 3,
-        PropertyName: 4,
-        Separator: 5,
-        PropertyValue: 6,
-        SingleQuotedString: 7,
-        DoubleQuotedString: 8
+        QuotedStringSelector: 3,
+        Ruleset: 4,
+        PropertyName: 5,
+        Separator: 6,
+        PropertyValue: 7,
+        SingleQuotedString: 8,
+        DoubleQuotedString: 9
     };
     state = State.Start;
 
@@ -138,6 +139,13 @@ function cssbeautify(style, opt) {
         }
 
         if (state === State.Selectors) {
+            // Skip any quoted string
+            if (ch === '"') {
+                formatted += ch;
+                state = State.QuotedStringSelector;
+                continue;
+            }
+
             // Continue until we hit '{'
             if (ch === '{') {
                 formatted = trimRight(formatted);
@@ -149,6 +157,17 @@ function cssbeautify(style, opt) {
             } else {
                 formatted += ch;
             }
+            continue;
+        }
+
+        if (state === State.QuotedStringSelector) {
+            // Continue until we hit another double quote
+            if (ch === '"') {
+                state = State.Selectors;
+                formatted += ch;
+                continue;
+            }
+            formatted += ch;
             continue;
         }
 
