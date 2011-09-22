@@ -101,14 +101,17 @@ function cssbeautify(style, opt) {
                     (ch >= '0' && ch <= '9') ||
                     (ch === '-') || (ch === '_') ||
                     (ch === '-') || (ch === '_') ||
-                    (ch === '*') ||
+                    (ch === '*') || (ch === '@') ||
                     (ch === '.') || (ch === ':')) {
 
                 // Clear trailing whitespaces and linefeeds.
                 str = trimRight(formatted);
 
-                // After finishing a ruleset, there should be one blank line.
-                if (str.charAt(str.length - 1) === '}') {
+                // After finishing a ruleset or directive statement,
+                // there should be one blank line.
+                if (str.charAt(str.length - 1) === '}' ||
+                        str.charAt(str.length - 1) === ';') {
+
                     formatted = str + '\n\n';
                 } else {
                     // After block comment, keep all the linefeeds but
@@ -143,6 +146,14 @@ function cssbeautify(style, opt) {
             if (ch === '"') {
                 formatted += ch;
                 state = State.QuotedStringSelector;
+                continue;
+            }
+
+            //  Semicolon terminate a directive, e.g. @import url('...')
+            if (ch === ';') {
+                formatted = trimRight(formatted);
+                formatted += ';\n';
+                state = State.Start;
                 continue;
             }
 
