@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <title>Unit tests for CSS Beautifier</title>
+<script src="cssbeautify.js" type="text/javascript" charset="utf-8"></script>
 <style>
-.name {
-    color: red;
+p#title {
+    font-weight: bold;
 }
 
 pre {
@@ -26,24 +27,37 @@ pre {
 .result {
     border: 1px solid red;
 }
+
+.fail {
+    color: red;
+}
 </style>
-<script src="cssbeautify.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
 
 <!--
-Every test data consists of a pair of styles with matching ids.
-The baseline/reference should have -ref suffix.
+Every test data consists of a pair of pre with matching ids.
+The test has the 'source' class and the baseline/reference has the 'ref' class.
 -->
 
-<style id="simple">
+<div>
+
+<p id="title">Test simple style:</p>
+
+<p>Raw CSS</p>
+
+<pre id="simple" class="source">
 menu { color: blue; }
 
 box { border-radius: 4px; background-color: red }
 
 a { color: green }
 b { color: red }
-</style>
+</pre>
 
-<style id="simple-ref">
+<p>Baseline reference</p>
+
+<pre id="simple" class="ref">
 menu {
     color: blue;
 }
@@ -60,9 +74,17 @@ a {
 b {
     color: red
 }
-</style>
+</pre>
 
-<style id="comment">
+</div>
+
+<div>
+
+<p id="title">Test line comment and block comment:</p>
+
+<p>Raw CSS</p>
+
+<pre id="comment" class="source">
 /* line comment */
 navigation { color: blue }
 
@@ -81,9 +103,11 @@ invisible {
      * inside */
     color: #eee
 }
-</style>
+</pre>
 
-<style id="comment-ref">
+<p>Baseline reference</p>
+
+<pre id="comment" class="ref">
 /* line comment */
 navigation {
     color: blue
@@ -106,22 +130,39 @@ invisible {
      * inside */
     color: #eee
 }
-</style>
+</pre>
 
-<!-- wrong indentation should be corrected -->
-<style id="indent">
+</div>
+
+<div>
+
+<p id="title">Test correction of wrong indentation:</p>
+
+<p>Raw CSS</p>
+
+<pre id="indent" class="source">
      navigation {
     color: blue
   }
-</style>
-<style id="indent-ref">
+</pre>
+
+<p>Baseline reference</p>
+
+<pre id="indent" class="ref">
 navigation {
     color: blue
 }
-</style>
+</pre>
 
-<!-- test various whitespaces placement and elimination -->
-<style id="spaces">
+</div>
+
+<div>
+
+<p id="title">Test fixing blank lines and spaces:</p>
+
+<p>Raw CSS</p>
+
+<pre id="spaces" class="source">
 /* only one blank line between */
 menu { color: red }
 
@@ -152,9 +193,11 @@ footer {
 
   float   :right;
   }
-</style>
+</pre>
 
-<style id="spaces-ref">
+<p>Baseline reference</p>
+
+<pre id="spaces" class="ref">
 /* only one blank line between */
 menu {
     color: red
@@ -190,15 +233,24 @@ footer {
     font-family: Arial;
     float: right;
 }
-</style>
+</pre>
 
-<!-- String inside the property value should be taken into account -->
-<style id="string">
+</div>
+
+<div>
+
+<p id="title">Test ignoring quoted string inside property value:</p>
+
+<p>Raw CSS</p>
+
+<pre id="string" class="source">
 nav:after{content:'}'}
 nav:before{content:"}"}
-</style>
+</pre>
 
-<style id="string-ref">
+<p>Baseline reference</p>
+
+<pre id="string" class="ref">
 nav:after {
     content: '}'
 }
@@ -206,15 +258,24 @@ nav:after {
 nav:before {
     content: "}"
 }
-</style>
+</pre>
 
-<!-- All type of selector syntax should be supported -->
-<style id="selector">
+</div>
+
+<div>
+
+<p id="title">Test various corner cases of selector:</p>
+
+<p>Raw CSS</p>
+
+<pre id="selector" class="source">
 * { border: 0px solid blue; }
 div[class="{}"] { color: red; }
-</style>
+</pre>
 
-<style id="selector-ref">
+<p>Baseline reference</p>
+
+<pre id="selector" class="ref">
 * {
     border: 0px solid blue;
 }
@@ -222,27 +283,30 @@ div[class="{}"] { color: red; }
 div[class="{}"] {
     color: red;
 }
-</style>
+</pre>
 
-</head>
-<body>
+</div>
+
 <script>
 var total = 0, failures = 0, data = {},
-    list, i, e, id, name, test;
+    list, i, e, id, cls, name, test;
 
 // Convert into a set of test fixture.
-list = document.getElementsByTagName('style');
+list = document.getElementsByTagName('pre');
 for (i = 0; i < list.length; i += 1) {
     e = list[i];
     id = e.id;
+    cls = e.getAttribute('class');
     if (typeof id === 'string' && id.length > 0) {
-        if (id.match(/\-ref$/)) {
-          id = id.substring(0, id.length - 4);
-          data[id] = data[id] || {};
-          data[id].ref = e.innerHTML.replace(/^\s+/, '').replace(/\s+$/, '');
-        } else {
+        if (cls === 'source') {
           data[id] = data[id] || {};
           data[id].source = e.innerHTML;
+          data[id].el = e.parentNode;
+        }
+        if (cls === 'ref') {
+          data[id] = data[id] || {};
+          data[id].ref = e.innerHTML.replace(/^\s+/, '').replace(/\s+$/, '');
+          data[id].el = e.parentNode;
         }
     }
 }
@@ -255,18 +319,29 @@ for (name in data) {
         test.result = cssbeautify(test.source).replace(/^\s+/, '').replace(/\s+$/, '');
         if (test.result !== test.ref) {
             failures += 1;
-            document.write('<p class="name">Failed: ' + name + '</p>');
-            document.write('<p>Raw CSS:</p>');
-            document.write('<pre class="source">' + test.source + '</pre>');
-            document.write('<p>Expected baseline:</p>');
-            document.write('<pre class="ref">' + test.ref + '</pre>');
-            document.write('<p>Actual:</p>');
-            document.write('<pre class="result">' + test.result + '</pre>');
+            e = document.createElement('p');
+            e.textContent = 'Actual';
+            data[name].el.appendChild(e);
+            e = document.createElement('pre');
+            e.setAttribute('class', 'result');
+            e.setAttribute('id', 'fail');
+            e.textContent = test.result;
+            data[name].el.appendChild(e);
+            e = document.createElement('p');
+            e.textContent = 'Status: FAILED';
+            e.setAttribute('class', 'fail');
+            data[name].el.appendChild(e);
+        } else {
+            e = document.createElement('p');
+            e.textContent = 'Status: PASS';
+            data[name].el.appendChild(e);
         }
     }
 }
 
-document.write('<p>' + total + ' tests, ' + failures + ' failure(s).</p>');
+e = document.createElement('p');
+e.textContent = total + ' tests, ' + failures + ' failure(s).';
+document.body.insertBefore(e, document.body.firstChild);
 </script>
 </body>
 </html>
