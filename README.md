@@ -41,7 +41,7 @@ Example call:
 
 ## Contributing ##
 
-Before we can accept any contributions, you need to sign [Contributor License Agreement](http://en.wikipedia.org/wiki/Contributor_License_Agreement). We are preparing the CLA and it should be available soon.
+Before we can accept any contributions, you need to sign [Contributor License Agreement](http://en.wikipedia.org/wiki/Contributor_License_Agreement). You can do that using Sencha Labs [online CLA](http://www.sencha.com/cla).
 
 For the actual contribution, please use [Github pull request](http://help.github.com/pull-requests/) workflow.
 
