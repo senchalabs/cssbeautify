@@ -78,11 +78,16 @@ function cssbeautify(style, opt) {
         ch2 = style.charAt(index + 1);
         index += 1;
 
-        // TODO: fully implement http://www.w3.org/TR/CSS2/syndata.html#strings
+        // String literal
         if (isQuote(quote)) {
             formatted += ch;
             if (ch === quote) {
                 quote = null;
+            }
+            if (ch === '\\' && ch2 === quote) {
+                // Don't treat escaped character as the closing quote
+                formatted += ch2;
+                index += 1;
             }
             continue;
         }

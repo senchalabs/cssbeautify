@@ -271,6 +271,7 @@ nav:before {
 <pre id="selector" class="source">
 * { border: 0px solid blue; }
 div[class="{}"] { color: red; }
+a[id="\"foo"] { padding: 0; }
 </pre>
 
 <p>Baseline reference</p>
@@ -282,6 +283,10 @@ div[class="{}"] { color: red; }
 
 div[class="{}"] {
     color: red;
+}
+
+a[id="\"foo"] {
+    padding: 0;
 }
 </pre>
 
