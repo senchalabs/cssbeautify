@@ -62,8 +62,8 @@ function cssbeautify(style, opt) {
         Start: 0,
         BlockComment: 1,
         AtRule: 2,
-        Selectors: 3,
-        Ruleset: 4,
+        Selector: 3,
+        Block: 4,
         PropertyName: 5,
         Separator: 6,
         PropertyValue: 7
@@ -105,7 +105,7 @@ function cssbeautify(style, opt) {
                 continue;
             }
 
-            // Selectors or at-rule
+            // Selector or at-rule
             // FIXME: handle Unicode characters
             if ((ch >= 'a' && ch <= 'z') ||
                     (ch >= 'A' && ch <= 'Z') ||
@@ -136,7 +136,7 @@ function cssbeautify(style, opt) {
                     }
                 }
                 formatted += ch;
-                state = (ch === '@') ? State.AtRule : State.Selectors;
+                state = (ch === '@') ? State.AtRule : State.Selector;
                 continue;
             }
         }
@@ -163,7 +163,7 @@ function cssbeautify(style, opt) {
             continue;
         }
 
-        if (state === State.Selectors) {
+        if (state === State.Selector) {
 
             // Handle string literal
             if (isQuote(ch)) {
@@ -187,14 +187,14 @@ function cssbeautify(style, opt) {
                 if (ch2 !== '\n') {
                     formatted += '\n';
                 }
-                state = State.Ruleset;
+                state = State.Block;
             } else {
                 formatted += ch;
             }
             continue;
         }
 
-        if (state === State.Ruleset) {
+        if (state === State.Block) {
             // Continue until we hit '}'
             if (ch === '}') {
                 formatted = trimRight(formatted);
@@ -264,7 +264,7 @@ function cssbeautify(style, opt) {
             if (ch === ';') {
                 formatted = trimRight(formatted);
                 formatted += ';\n';
-                state = State.Ruleset;
+                state = State.Block;
                 continue;
             }
             // or until we hit '}'
