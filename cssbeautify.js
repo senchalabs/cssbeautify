@@ -27,7 +27,7 @@
 function cssbeautify(style, opt) {
     "use strict";
     var options, index = 0, length = style.length, formatted = '',
-        ch, ch2, str, state, State,
+        ch, ch2, str, state, State, quote,
         openbrace = ' {',
         trimRight;
 
@@ -41,6 +41,10 @@ function cssbeautify(style, opt) {
 
     function isWhitespace(c) {
         return ' \t\n\r\f'.indexOf(c) >= 0;
+    }
+
+    function isQuote(c) {
+        return '\'"'.indexOf(c) >= 0;
     }
 
     if (String.prototype.trimRight) {
@@ -59,13 +63,10 @@ function cssbeautify(style, opt) {
         BlockComment: 1,
         AtRule: 2,
         Selectors: 3,
-        QuotedStringSelector: 4,
-        Ruleset: 5,
-        PropertyName: 6,
-        Separator: 7,
-        PropertyValue: 8,
-        SingleQuotedString: 9,
-        DoubleQuotedString: 10
+        Ruleset: 4,
+        PropertyName: 5,
+        Separator: 6,
+        PropertyValue: 7
     };
     state = State.Start;
 
@@ -76,6 +77,15 @@ function cssbeautify(style, opt) {
         ch = style.charAt(index);
         ch2 = style.charAt(index + 1);
         index += 1;
+
+        // TODO: fully implement http://www.w3.org/TR/CSS2/syndata.html#strings
+        if (isQuote(quote)) {
+            formatted += ch;
+            if (ch === quote) {
+                quote = null;
+            }
+            continue;
+        }
 
         if (state === State.Start) {
 
@@ -154,10 +164,11 @@ function cssbeautify(style, opt) {
         }
 
         if (state === State.Selectors) {
-            // Skip any quoted string
-            if (ch === '"') {
+
+            // Handle string literal
+            if (isQuote(ch)) {
                 formatted += ch;
-                state = State.QuotedStringSelector;
+                quote = ch;
                 continue;
             }
 
@@ -180,17 +191,6 @@ function cssbeautify(style, opt) {
             } else {
                 formatted += ch;
             }
-            continue;
-        }
-
-        if (state === State.QuotedStringSelector) {
-            // Continue until we hit another double quote
-            if (ch === '"') {
-                state = State.Selectors;
-                formatted += ch;
-                continue;
-            }
-            formatted += ch;
             continue;
         }
 
@@ -243,11 +243,9 @@ function cssbeautify(style, opt) {
         if (state === State.Separator) {
             if (!isWhitespace(ch)) {
                 formatted += ch;
-                if (ch === '\'') {
-                    state = State.SingleQuotedString;
-                    continue;
-                } else if (ch === '"') {
-                    state = State.DoubleQuotedString;
+                if (isQuote(ch)) {
+                    state = State.PropertyValue;
+                    quote = ch;
                     continue;
                 }
                 state = State.PropertyValue;
@@ -257,14 +255,9 @@ function cssbeautify(style, opt) {
         }
 
         if (state === State.PropertyValue) {
-            if (ch === '\'') {
+            if (isQuote(ch)) {
                 formatted += ch;
-                state = State.SingleQuotedString;
-                continue;
-            }
-            if (ch === '"') {
-                formatted += ch;
-                state = State.DoubleQuotedString;
+                quote = ch;
                 continue;
             }
             // Continue until we hit ';''
@@ -284,31 +277,6 @@ function cssbeautify(style, opt) {
             formatted += ch;
             continue;
         }
-
-        // TODO: fully implement http://www.w3.org/TR/CSS2/syndata.html#strings
-        if (state === State.SingleQuotedString) {
-            // Continue until we hit another single quote
-            if (ch === '\'') {
-                state = State.PropertyValue;
-                formatted += ch;
-                continue;
-            }
-            formatted += ch;
-            continue;
-        }
-
-        // TODO: fully implement http://www.w3.org/TR/CSS2/syndata.html#strings
-        if (state === State.DoubleQuotedString) {
-            // Continue until we hit another double quote
-            if (ch === '"') {
-                state = State.PropertyValue;
-                formatted += ch;
-                continue;
-            }
-            formatted += ch;
-            continue;
-        }
-
 
         // The default action is to copy the character (to prevent
         // infinite loop).
