@@ -172,14 +172,6 @@ function cssbeautify(style, opt) {
                 continue;
             }
 
-            //  Semicolon terminate a directive, e.g. @import url('...')
-            if (ch === ';') {
-                formatted = trimRight(formatted);
-                formatted += ';\n';
-                state = State.Start;
-                continue;
-            }
-
             // Continue until we hit '{'
             if (ch === '{') {
                 formatted = trimRight(formatted);
