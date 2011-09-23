@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>CSS Beautifier (by Sencha)</title>
-    <script src="cssbeautify.js" type="text/javascript" charset="utf-8"></script>
+    <script src="cssbeautify.js" charset="utf-8"></script>
     <script type="text/javascript">
     var formatId;
     function format() {
@@ -89,6 +89,7 @@ input {
     <p>Indent with<br>
     <label><input checked type="radio" name="indent" id="spaces" value="spaces" onChange='format()'>spaces</label><br>
     <label><input type="radio" name="indent" id="tab" value="tab" onChange='format()'>tab</label>
+    </p>
     <p>Place open curly brace<br>
     <label><input checked type="radio" name="openbrace" id="openbrace-end-of-line" onChange='format()'>at the end-of-line</label><br>
     <label><input type="radio" name="openbrace" id="openbrace-separate-line" onChange='format()'>in a separate line</label>
@@ -105,19 +106,24 @@ input {
   </div>
   <script>format();</script>
 
-<script type="text/javascript">
+  <script type="text/javascript">
 
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-1396058-12']);
-  _gaq.push(['_trackPageview']);
+    if ('senchalabs.github.com' == document.location.hostname) {
 
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-1396058-12']);
+      _gaq.push(['_trackPageview']);
 
-</script>
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    }
+
+  </script>
+
 </body>
 
 </html>
