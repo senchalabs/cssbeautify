@@ -303,7 +303,7 @@ menu{background-color:red} @import url('foobar.css') screen;
 nav{margin:0}
 </pre>
 
-<p>Raw CSS</p>
+<p>Baseline reference</p>
 
 <pre id="import" class="ref">
 menu {
@@ -315,6 +315,47 @@ menu {
 nav {
     margin: 0
 }
+</pre>
+
+</div>
+
+<div>
+
+<p id="title">Test media directive:</p>
+
+<p>Raw CSS</p>
+
+<pre id="media" class="source">
+@import "subs.css";
+@import "print-main.css" print;
+@media print {
+  body { font-size: 10pt }
+  nav { color: blue; }
+}
+h1 {color: red; }
+</pre>
+
+<p>Baseline reference</p>
+
+<pre id="media" class="ref">
+@import "subs.css";
+
+@import "print-main.css" print;
+
+@media print {
+    body {
+        font-size: 10pt
+    }
+
+    nav {
+        color: blue;
+    }
+}
+
+h1 {
+    color: red;
+}
+
 </pre>
 
 </div>
