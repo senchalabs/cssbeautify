@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Unit tests for CSS Beautifier</title>
+<script src="cssbeautify.js" type="text/javascript" charset="utf-8"></script>
+<style>
+p#title {
+    font-weight: bold;
+}
+
+pre {
+    margin-left: 20px;
+    padding: 5px;
+    display: block;
+    width: 500px;
+}
+
+.source {
+    background-color: #ddd;
+}
+
+.ref {
+    border: 1px solid blue;
+}
+
+.result {
+    border: 1px solid red;
+}
+
+.fail {
+    color: red;
+}
+</style>
+</head>
+<body>
+
+<!--
+Every test data consists of a pair of pre with matching ids.
+The test has the 'source' class and the baseline/reference has the 'ref' class.
+-->
+
+<div>
+
+<p id="title">Test simple style:</p>
+
+<p>Raw CSS</p>
+
+<pre id="simple" class="source">
+menu { color: blue; }
+
+box { border-radius: 4px; background-color: red }
+
+a { color: green }
+b { color: red }
+</pre>
+
+<p>Baseline reference</p>
+
+<pre id="simple" class="ref">
+menu {
+    color: blue;
+}
+
+box {
+    border-radius: 4px;
+    background-color: red
+}
+
+a {
+    color: green
+}
+
+b {
+    color: red
+}
+</pre>
+
+</div>
+
+<div>
+
+<p id="title">Test line comment and block comment:</p>
+
+<p>Raw CSS</p>
+
+<pre id="comment" class="source">
+/* line comment */
+navigation { color: blue }
+
+menu {
+    /* line comment inside */
+    border: 2px
+}
+
+/* block
+ comment */
+sidebar { color: red }
+
+invisible {
+    /* block
+     * comment
+     * inside */
+    color: #eee
+}
+</pre>
+
+<p>Baseline reference</p>
+
+<pre id="comment" class="ref">
+/* line comment */
+navigation {
+    color: blue
+}
+
+menu {
+    /* line comment inside */
+    border: 2px
+}
+
+/* block
+ comment */
+sidebar {
+    color: red
+}
+
+invisible {
+    /* block
+     * comment
+     * inside */
+    color: #eee
+}
+</pre>
+
+</div>
+
+<div>
+
+<p id="title">Test correction of wrong indentation:</p>
+
+<p>Raw CSS</p>
+
+<pre id="indent" class="source">
+     navigation {
+    color: blue
+  }
+</pre>
+
+<p>Baseline reference</p>
+
+<pre id="indent" class="ref">
+navigation {
+    color: blue
+}
+</pre>
+
+</div>
+
+<div>
+
+<p id="title">Test fixing blank lines and spaces:</p>
+
+<p>Raw CSS</p>
+
+<pre id="spaces" class="source">
+/* only one blank line between */
+menu { color: red }
+
+
+
+
+navi { color: black }
+
+/* automatically insert a blank line */
+button { border: 1px } sidebar { color: #ffe }
+
+/* always whitespace before { */
+hidden{opacity:0%}
+
+/* no blank lines inside ruleset */
+imprint {
+  color: blue;
+
+
+    opacity: 0.5;
+
+   font-size: small
+}
+
+/* before colon: no space, after colon: one space only */
+footer {
+      font-family:     Arial;
+
+  float   :right;
+  }
+</pre>
+
+<p>Baseline reference</p>
+
+<pre id="spaces" class="ref">
+/* only one blank line between */
+menu {
+    color: red
+}
+
+navi {
+    color: black
+}
+
+/* automatically insert a blank line */
+button {
+    border: 1px
+}
+
+sidebar {
+    color: #ffe
+}
+
+/* always whitespace before { */
+hidden {
+    opacity: 0%
+}
+
+/* no blank lines inside ruleset */
+imprint {
+    color: blue;
+    opacity: 0.5;
+    font-size: small
+}
+
+/* before colon: no space, after colon: one space only */
+footer {
+    font-family: Arial;
+    float: right;
+}
+</pre>
+
+</div>
+
+<div>
+
+<p id="title">Test ignoring quoted string inside property value:</p>
+
+<p>Raw CSS</p>
+
+<pre id="string" class="source">
+nav:after{content:'}'}
+nav:before{content:"}"}
+</pre>
+
+<p>Baseline reference</p>
+
+<pre id="string" class="ref">
+nav:after {
+    content: '}'
+}
+
+nav:before {
+    content: "}"
+}
+</pre>
+
+</div>
+
+<div>
+
+<p id="title">Test various corner cases of selector:</p>
+
+<p>Raw CSS</p>
+
+<pre id="selector" class="source">
+* { border: 0px solid blue; }
+div[class="{}"] { color: red; }
+</pre>
+
+<p>Baseline reference</p>
+
+<pre id="selector" class="ref">
+* {
+    border: 0px solid blue;
+}
+
+div[class="{}"] {
+    color: red;
+}
+</pre>
+
+</div>
+
+<div>
+
+<p id="title">Test import directive:</p>
+
+<p>Raw CSS</p>
+
+<pre id="import" class="source">
+menu{background-color:red} @import url('foobar.css') screen;
+nav{margin:0}
+</pre>
+
+<p>Raw CSS</p>
+
+<pre id="import" class="ref">
+menu {
+    background-color: red
+}
+
+@import url('foobar.css') screen;
+
+nav {
+    margin: 0
+}
+</pre>
+
+</div>
+
+<script>
+var total = 0, failures = 0, data = {},
+    list, i, e, id, cls, name, test;
+
+// Convert into a set of test fixture.
+list = document.getElementsByTagName('pre');
+for (i = 0; i < list.length; i += 1) {
+    e = list[i];
+    id = e.id;
+    cls = e.getAttribute('class');
+    if (typeof id === 'string' && id.length > 0) {
+        if (cls === 'source') {
+          data[id] = data[id] || {};
+          data[id].source = e.innerHTML;
+          data[id].el = e.parentNode;
+        }
+        if (cls === 'ref') {
+          data[id] = data[id] || {};
+          data[id].ref = e.innerHTML.replace(/^\s+/, '').replace(/\s+$/, '');
+          data[id].el = e.parentNode;
+        }
+    }
+}
+
+// Go through all the fixture and create the formatted version.
+for (name in data) {
+    if (data.hasOwnProperty(name)) {
+        total += 1;
+        test = data[name];
+        test.result = cssbeautify(test.source).replace(/^\s+/, '').replace(/\s+$/, '');
+        if (test.result !== test.ref) {
+            failures += 1;
+            e = document.createElement('p');
+            e.textContent = 'Actual';
+            data[name].el.appendChild(e);
+            e = document.createElement('pre');
+            e.setAttribute('class', 'result');
+            e.setAttribute('id', 'fail');
+            e.textContent = test.result;
+            data[name].el.appendChild(e);
+            e = document.createElement('p');
+            e.textContent = 'Status: FAILED';
+            e.setAttribute('class', 'fail');
+            data[name].el.appendChild(e);
+        } else {
+            e = document.createElement('p');
+            e.textContent = 'Status: PASS';
+            data[name].el.appendChild(e);
+        }
+    }
+}
+
+e = document.createElement('p');
+e.textContent = total + ' tests, ' + failures + ' failure(s).';
+document.body.insertBefore(e, document.body.firstChild);
+</script>
+</body>
+</html>

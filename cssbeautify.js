@@ -57,14 +57,15 @@ function cssbeautify(style, opt) {
     State = {
         Start: 0,
         BlockComment: 1,
-        Selectors: 2,
-        QuotedStringSelector: 3,
-        Ruleset: 4,
-        PropertyName: 5,
-        Separator: 6,
-        PropertyValue: 7,
-        SingleQuotedString: 8,
-        DoubleQuotedString: 9
+        AtRule: 2,
+        Selectors: 3,
+        QuotedStringSelector: 4,
+        Ruleset: 5,
+        PropertyName: 6,
+        Separator: 7,
+        PropertyValue: 8,
+        SingleQuotedString: 9,
+        DoubleQuotedString: 10
     };
     state = State.Start;
 
@@ -94,7 +95,7 @@ function cssbeautify(style, opt) {
                 continue;
             }
 
-            // Selectors
+            // Selectors or at-rule
             // FIXME: handle Unicode characters
             if ((ch >= 'a' && ch <= 'z') ||
                     (ch >= 'A' && ch <= 'Z') ||
@@ -125,7 +126,7 @@ function cssbeautify(style, opt) {
                     }
                 }
                 formatted += ch;
-                state = State.Selectors;
+                state = (ch === '@') ? State.AtRule : State.Selectors;
                 continue;
             }
         }
@@ -138,6 +139,17 @@ function cssbeautify(style, opt) {
                 formatted += ch2;
                 index += 1;
             }
+            continue;
+        }
+
+        if (state === State.AtRule) {
+            // Continue until we hit semicolon
+            if (ch === ';') {
+                formatted += ch;
+                state = State.Start;
+                continue;
+            }
+            formatted += ch;
             continue;
         }
 
