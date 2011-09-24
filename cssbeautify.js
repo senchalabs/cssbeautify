@@ -80,7 +80,7 @@ function cssbeautify(style, opt) {
         ch2 = style.charAt(index + 1);
         index += 1;
 
-        // String literal
+        // Inside a string literal?
         if (isQuote(quote)) {
             formatted += ch;
             if (ch === quote) {
@@ -91,6 +91,13 @@ function cssbeautify(style, opt) {
                 formatted += ch2;
                 index += 1;
             }
+            continue;
+        }
+
+        // Starting a string literal?
+        if (isQuote(ch)) {
+            formatted += ch;
+            quote = ch;
             continue;
         }
 
@@ -184,13 +191,6 @@ function cssbeautify(style, opt) {
 
         if (state === State.Selector) {
 
-            // Handle string literal
-            if (isQuote(ch)) {
-                formatted += ch;
-                quote = ch;
-                continue;
-            }
-
             // '{' starts the ruleset.
             if (ch === '{') {
                 depth += 1;
@@ -256,7 +256,10 @@ function cssbeautify(style, opt) {
             if (ch === ':') {
                 formatted = trimRight(formatted);
                 formatted += ': ';
-                state = State.Separator;
+                state = State.Expression;
+                if (isWhitespace(ch2)) {
+                    state = State.Separator;
+                }
                 continue;
             }
 
@@ -281,23 +284,19 @@ function cssbeautify(style, opt) {
             // Non-whitespace starts the expression.
             if (!isWhitespace(ch)) {
                 formatted += ch;
-                if (isQuote(ch)) {
-                    state = State.Expression;
-                    quote = ch;
-                    continue;
-                }
                 state = State.Expression;
                 continue;
             }
+
+            // Anticipate string literal.
+            if (isQuote(ch2)) {
+                state = State.Expression;
+            }
+
             continue;
         }
 
         if (state === State.Expression) {
-            if (isQuote(ch)) {
-                formatted += ch;
-                quote = ch;
-                continue;
-            }
 
             // '}' finishes the ruleset.
             if (ch === '}') {
