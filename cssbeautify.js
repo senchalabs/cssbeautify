@@ -27,7 +27,7 @@
 function cssbeautify(style, opt) {
     "use strict";
     var options, index = 0, length = style.length, formatted = '',
-        ch, ch2, str, state, State, quote, comment,
+        ch, ch2, str, state, State, depth, quote, comment,
         openbrace = ' {',
         trimRight;
 
@@ -62,11 +62,13 @@ function cssbeautify(style, opt) {
         Start: 0,
         AtRule: 1,
         Selector: 2,
-        Block: 3,
-        PropertyName: 4,
+        Ruleset: 3,
+        Property: 4,
         Separator: 5,
-        PropertyValue: 6
+        Expression: 6
     };
+
+    depth = 0;
     state = State.Start;
     comment = false;
 
@@ -157,19 +159,23 @@ function cssbeautify(style, opt) {
         }
 
         if (state === State.AtRule) {
-            // Continue until we hit semicolon
+
+            // ';' terminates a statement.
             if (ch === ';') {
                 formatted += ch;
                 state = State.Start;
                 continue;
             }
-            // or a block
+
+            // '{' starts a block
             if (ch === '{') {
+                depth += 1;
                 formatted = trimRight(formatted);
                 formatted += openbrace;
                 if (ch2 !== '\n') {
                     formatted += '\n';
                 }
+                state = State.Selector;
                 continue;
             }
             formatted += ch;
@@ -185,100 +191,134 @@ function cssbeautify(style, opt) {
                 continue;
             }
 
-            // Continue until we hit '{'
+            // '{' starts the ruleset.
             if (ch === '{') {
+                depth += 1;
                 formatted = trimRight(formatted);
                 formatted += openbrace;
                 if (ch2 !== '\n') {
                     formatted += '\n';
                 }
-                state = State.Block;
-            } else {
-                formatted += ch;
+                state = State.Ruleset;
+                continue;
             }
-            continue;
-        }
 
-        if (state === State.Block) {
-            // Continue until we hit '}'
+            // '}' resets the state.
             if (ch === '}') {
+                depth -= 1;
                 formatted = trimRight(formatted);
                 formatted += '\n}';
                 state = State.Start;
                 continue;
             }
+
+            formatted += ch;
+            continue;
+        }
+
+        if (state === State.Ruleset) {
+
+            // '}' finishes the ruleset.
+            if (ch === '}') {
+                depth -= 1;
+                formatted = trimRight(formatted);
+                formatted += '\n}';
+                state = State.Start;
+                if (depth > 0) {
+                    state = State.Selector;
+                }
+                continue;
+            }
+
             // Make sure there is no blank line or trailing spaces inbetween
             if (ch === '\n') {
                 formatted = trimRight(formatted);
                 formatted += '\n';
                 continue;
             }
+
             // property name
             if (!isWhitespace(ch)) {
                 formatted = trimRight(formatted);
                 formatted += '\n';
                 formatted += options.indent;
                 formatted += ch;
-                state = State.PropertyName;
+                state = State.Property;
                 continue;
             }
             formatted += ch;
             continue;
         }
 
-        if (state === State.PropertyName) {
-            // Continue until we hit ':'
+        if (state === State.Property) {
+
+            // ':' concludes the property.
             if (ch === ':') {
                 formatted = trimRight(formatted);
                 formatted += ': ';
                 state = State.Separator;
                 continue;
             }
-            // or until we hit '}'
+
+            // '}' finishes the ruleset.
             if (ch === '}') {
+                depth -= 1;
                 formatted = trimRight(formatted);
                 formatted += '\n}';
                 state = State.Start;
+                if (depth > 0) {
+                    state = State.Selector;
+                }
                 continue;
             }
+
             formatted += ch;
             continue;
         }
 
         if (state === State.Separator) {
+
+            // Non-whitespace starts the expression.
             if (!isWhitespace(ch)) {
                 formatted += ch;
                 if (isQuote(ch)) {
-                    state = State.PropertyValue;
+                    state = State.Expression;
                     quote = ch;
                     continue;
                 }
-                state = State.PropertyValue;
+                state = State.Expression;
                 continue;
             }
             continue;
         }
 
-        if (state === State.PropertyValue) {
+        if (state === State.Expression) {
             if (isQuote(ch)) {
                 formatted += ch;
                 quote = ch;
                 continue;
             }
-            // Continue until we hit ';''
-            if (ch === ';') {
-                formatted = trimRight(formatted);
-                formatted += ';\n';
-                state = State.Block;
-                continue;
-            }
-            // or until we hit '}'
+
+            // '}' finishes the ruleset.
             if (ch === '}') {
+                depth -= 1;
                 formatted = trimRight(formatted);
                 formatted += '\n}';
                 state = State.Start;
+                if (depth > 0) {
+                    state = State.Selector;
+                }
                 continue;
             }
+
+            // ';' completes the declaration.
+            if (ch === ';') {
+                formatted = trimRight(formatted);
+                formatted += ';\n';
+                state = State.Ruleset;
+                continue;
+            }
+
             formatted += ch;
             continue;
         }
