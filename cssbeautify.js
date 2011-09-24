@@ -163,6 +163,15 @@ function cssbeautify(style, opt) {
                 state = State.Start;
                 continue;
             }
+            // or a block
+            if (ch === '{') {
+                formatted = trimRight(formatted);
+                formatted += openbrace;
+                if (ch2 !== '\n') {
+                    formatted += '\n';
+                }
+                continue;
+            }
             formatted += ch;
             continue;
         }
