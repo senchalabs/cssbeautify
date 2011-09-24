@@ -27,7 +27,7 @@
 function cssbeautify(style, opt) {
     "use strict";
     var options, index = 0, length = style.length, formatted = '',
-        ch, ch2, str, state, State, quote,
+        ch, ch2, str, state, State, quote, comment,
         openbrace = ' {',
         trimRight;
 
@@ -60,15 +60,15 @@ function cssbeautify(style, opt) {
 
     State = {
         Start: 0,
-        BlockComment: 1,
-        AtRule: 2,
-        Selector: 3,
-        Block: 4,
-        PropertyName: 5,
-        Separator: 6,
-        PropertyValue: 7
+        AtRule: 1,
+        Selector: 2,
+        Block: 3,
+        PropertyName: 4,
+        Separator: 5,
+        PropertyValue: 6
     };
     state = State.Start;
+    comment = false;
 
     // We want to deal with LF (\n) only
     style = style.replace(/\r\n/g, '\n');
@@ -92,21 +92,31 @@ function cssbeautify(style, opt) {
             continue;
         }
 
+        // Comment
+        if (comment) {
+            formatted += ch;
+            if (ch === '*' && ch2 === '/') {
+                comment = false;
+                formatted += ch2;
+                index += 1;
+            }
+            continue;
+        } else {
+            if (ch === '/' && ch2 === '*') {
+                comment = true;
+                formatted += ch;
+                formatted += ch2;
+                index += 1;
+                continue;
+            }
+        }
+
         if (state === State.Start) {
 
             // Copy white spaces and control characters
             if (ch <= ' ' || ch.charCodeAt(0) >= 128) {
                 state = State.Start;
                 formatted += ch;
-                continue;
-            }
-
-            // Block comment
-            if (ch === '/' && ch2 === '*') {
-                state = State.BlockComment;
-                formatted += ch;
-                formatted += ch2;
-                index += 1;
                 continue;
             }
 
@@ -144,17 +154,6 @@ function cssbeautify(style, opt) {
                 state = (ch === '@') ? State.AtRule : State.Selector;
                 continue;
             }
-        }
-
-        if (state ===  State.BlockComment) {
-            // Continue until we hit the final marker '*/' (star, forward slash).
-            formatted += ch;
-            if (ch === '*' && ch2 === '/') {
-                state = State.Start;
-                formatted += ch2;
-                index += 1;
-            }
-            continue;
         }
 
         if (state === State.AtRule) {
