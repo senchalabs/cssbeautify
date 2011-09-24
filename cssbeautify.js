@@ -56,6 +56,12 @@ function cssbeautify(style, opt) {
         }
     }
 
+    function closeBlock() {
+        depth -= 1;
+        formatted = trimRight(formatted);
+        formatted += '\n}';
+    }
+
     if (String.prototype.trimRight) {
         trimRight = function (s) {
             return s.trimRight();
@@ -205,9 +211,7 @@ function cssbeautify(style, opt) {
 
             // '}' resets the state.
             if (ch === '}') {
-                depth -= 1;
-                formatted = trimRight(formatted);
-                formatted += '\n}';
+                closeBlock();
                 state = State.Start;
                 continue;
             }
@@ -220,9 +224,7 @@ function cssbeautify(style, opt) {
 
             // '}' finishes the ruleset.
             if (ch === '}') {
-                depth -= 1;
-                formatted = trimRight(formatted);
-                formatted += '\n}';
+                closeBlock();
                 state = State.Start;
                 if (depth > 0) {
                     state = State.Selector;
