@@ -62,6 +62,13 @@ function cssbeautify(style, opt) {
         formatted += '\n}';
     }
 
+    function appendIndent() {
+        var i;
+        for (i = depth; i > 0; i -= 1) {
+            formatted += options.indent;
+        }
+    }
+
     if (String.prototype.trimRight) {
         trimRight = function (s) {
             return s.trimRight();
@@ -243,7 +250,7 @@ function cssbeautify(style, opt) {
             if (!isWhitespace(ch)) {
                 formatted = trimRight(formatted);
                 formatted += '\n';
-                formatted += options.indent;
+                appendIndent();
                 formatted += ch;
                 state = State.Property;
                 continue;
