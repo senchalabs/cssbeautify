@@ -27,7 +27,7 @@
 function cssbeautify(style, opt) {
     "use strict";
     var options, index = 0, length = style.length, formatted = '',
-        ch, ch2, str, state, State,
+        ch, ch2, str, state, State, quote, comment,
         openbrace = ' {',
         trimRight;
 
@@ -43,6 +43,10 @@ function cssbeautify(style, opt) {
         return ' \t\n\r\f'.indexOf(c) >= 0;
     }
 
+    function isQuote(c) {
+        return '\'"'.indexOf(c) >= 0;
+    }
+
     if (String.prototype.trimRight) {
         trimRight = function (s) {
             return s.trimRight();
@@ -56,18 +60,15 @@ function cssbeautify(style, opt) {
 
     State = {
         Start: 0,
-        BlockComment: 1,
-        AtRule: 2,
-        Selectors: 3,
-        QuotedStringSelector: 4,
-        Ruleset: 5,
-        PropertyName: 6,
-        Separator: 7,
-        PropertyValue: 8,
-        SingleQuotedString: 9,
-        DoubleQuotedString: 10
+        AtRule: 1,
+        Selector: 2,
+        Block: 3,
+        PropertyName: 4,
+        Separator: 5,
+        PropertyValue: 6
     };
     state = State.Start;
+    comment = false;
 
     // We want to deal with LF (\n) only
     style = style.replace(/\r\n/g, '\n');
@@ -76,6 +77,39 @@ function cssbeautify(style, opt) {
         ch = style.charAt(index);
         ch2 = style.charAt(index + 1);
         index += 1;
+
+        // String literal
+        if (isQuote(quote)) {
+            formatted += ch;
+            if (ch === quote) {
+                quote = null;
+            }
+            if (ch === '\\' && ch2 === quote) {
+                // Don't treat escaped character as the closing quote
+                formatted += ch2;
+                index += 1;
+            }
+            continue;
+        }
+
+        // Comment
+        if (comment) {
+            formatted += ch;
+            if (ch === '*' && ch2 === '/') {
+                comment = false;
+                formatted += ch2;
+                index += 1;
+            }
+            continue;
+        } else {
+            if (ch === '/' && ch2 === '*') {
+                comment = true;
+                formatted += ch;
+                formatted += ch2;
+                index += 1;
+                continue;
+            }
+        }
 
         if (state === State.Start) {
 
@@ -86,16 +120,7 @@ function cssbeautify(style, opt) {
                 continue;
             }
 
-            // Block comment
-            if (ch === '/' && ch2 === '*') {
-                state = State.BlockComment;
-                formatted += ch;
-                formatted += ch2;
-                index += 1;
-                continue;
-            }
-
-            // Selectors or at-rule
+            // Selector or at-rule
             // FIXME: handle Unicode characters
             if ((ch >= 'a' && ch <= 'z') ||
                     (ch >= 'A' && ch <= 'Z') ||
@@ -126,20 +151,9 @@ function cssbeautify(style, opt) {
                     }
                 }
                 formatted += ch;
-                state = (ch === '@') ? State.AtRule : State.Selectors;
+                state = (ch === '@') ? State.AtRule : State.Selector;
                 continue;
             }
-        }
-
-        if (state ===  State.BlockComment) {
-            // Continue until we hit the final marker '*/' (star, forward slash).
-            formatted += ch;
-            if (ch === '*' && ch2 === '/') {
-                state = State.Start;
-                formatted += ch2;
-                index += 1;
-            }
-            continue;
         }
 
         if (state === State.AtRule) {
@@ -149,23 +163,25 @@ function cssbeautify(style, opt) {
                 state = State.Start;
                 continue;
             }
+            // or a block
+            if (ch === '{') {
+                formatted = trimRight(formatted);
+                formatted += openbrace;
+                if (ch2 !== '\n') {
+                    formatted += '\n';
+                }
+                continue;
+            }
             formatted += ch;
             continue;
         }
 
-        if (state === State.Selectors) {
-            // Skip any quoted string
-            if (ch === '"') {
-                formatted += ch;
-                state = State.QuotedStringSelector;
-                continue;
-            }
+        if (state === State.Selector) {
 
-            //  Semicolon terminate a directive, e.g. @import url('...')
-            if (ch === ';') {
-                formatted = trimRight(formatted);
-                formatted += ';\n';
-                state = State.Start;
+            // Handle string literal
+            if (isQuote(ch)) {
+                formatted += ch;
+                quote = ch;
                 continue;
             }
 
@@ -176,25 +192,14 @@ function cssbeautify(style, opt) {
                 if (ch2 !== '\n') {
                     formatted += '\n';
                 }
-                state = State.Ruleset;
+                state = State.Block;
             } else {
                 formatted += ch;
             }
             continue;
         }
 
-        if (state === State.QuotedStringSelector) {
-            // Continue until we hit another double quote
-            if (ch === '"') {
-                state = State.Selectors;
-                formatted += ch;
-                continue;
-            }
-            formatted += ch;
-            continue;
-        }
-
-        if (state === State.Ruleset) {
+        if (state === State.Block) {
             // Continue until we hit '}'
             if (ch === '}') {
                 formatted = trimRight(formatted);
@@ -243,11 +248,9 @@ function cssbeautify(style, opt) {
         if (state === State.Separator) {
             if (!isWhitespace(ch)) {
                 formatted += ch;
-                if (ch === '\'') {
-                    state = State.SingleQuotedString;
-                    continue;
-                } else if (ch === '"') {
-                    state = State.DoubleQuotedString;
+                if (isQuote(ch)) {
+                    state = State.PropertyValue;
+                    quote = ch;
                     continue;
                 }
                 state = State.PropertyValue;
@@ -257,21 +260,16 @@ function cssbeautify(style, opt) {
         }
 
         if (state === State.PropertyValue) {
-            if (ch === '\'') {
+            if (isQuote(ch)) {
                 formatted += ch;
-                state = State.SingleQuotedString;
-                continue;
-            }
-            if (ch === '"') {
-                formatted += ch;
-                state = State.DoubleQuotedString;
+                quote = ch;
                 continue;
             }
             // Continue until we hit ';''
             if (ch === ';') {
                 formatted = trimRight(formatted);
                 formatted += ';\n';
-                state = State.Ruleset;
+                state = State.Block;
                 continue;
             }
             // or until we hit '}'
@@ -284,31 +282,6 @@ function cssbeautify(style, opt) {
             formatted += ch;
             continue;
         }
-
-        // TODO: fully implement http://www.w3.org/TR/CSS2/syndata.html#strings
-        if (state === State.SingleQuotedString) {
-            // Continue until we hit another single quote
-            if (ch === '\'') {
-                state = State.PropertyValue;
-                formatted += ch;
-                continue;
-            }
-            formatted += ch;
-            continue;
-        }
-
-        // TODO: fully implement http://www.w3.org/TR/CSS2/syndata.html#strings
-        if (state === State.DoubleQuotedString) {
-            // Continue until we hit another double quote
-            if (ch === '"') {
-                state = State.PropertyValue;
-                formatted += ch;
-                continue;
-            }
-            formatted += ch;
-            continue;
-        }
-
 
         // The default action is to copy the character (to prevent
         // infinite loop).
