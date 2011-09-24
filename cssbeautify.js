@@ -47,6 +47,14 @@ function cssbeautify(style, opt) {
         return '\'"'.indexOf(c) >= 0;
     }
 
+    // FIXME: handle Unicode characters
+    function isName(c) {
+        return (ch >= 'a' && ch <= 'z') ||
+            (ch >= 'A' && ch <= 'Z') ||
+            (ch >= '0' && ch <= '9') ||
+            '-_*.:'.indexOf(c) >= 0;
+    }
+
     function openBlock() {
         depth += 1;
         formatted = trimRight(formatted);
@@ -152,14 +160,7 @@ function cssbeautify(style, opt) {
             }
 
             // Selector or at-rule
-            // FIXME: handle Unicode characters
-            if ((ch >= 'a' && ch <= 'z') ||
-                    (ch >= 'A' && ch <= 'Z') ||
-                    (ch >= '0' && ch <= '9') ||
-                    (ch === '-') || (ch === '_') ||
-                    (ch === '-') || (ch === '_') ||
-                    (ch === '*') || (ch === '@') ||
-                    (ch === '.') || (ch === ':')) {
+            if (isName(ch) || (ch === '@')) {
 
                 // Clear trailing whitespaces and linefeeds.
                 str = trimRight(formatted);
