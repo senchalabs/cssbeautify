@@ -47,6 +47,15 @@ function cssbeautify(style, opt) {
         return '\'"'.indexOf(c) >= 0;
     }
 
+    function openBlock() {
+        depth += 1;
+        formatted = trimRight(formatted);
+        formatted += openbrace;
+        if (ch2 !== '\n') {
+            formatted += '\n';
+        }
+    }
+
     if (String.prototype.trimRight) {
         trimRight = function (s) {
             return s.trimRight();
@@ -176,15 +185,11 @@ function cssbeautify(style, opt) {
 
             // '{' starts a block
             if (ch === '{') {
-                depth += 1;
-                formatted = trimRight(formatted);
-                formatted += openbrace;
-                if (ch2 !== '\n') {
-                    formatted += '\n';
-                }
+                openBlock();
                 state = State.Selector;
                 continue;
             }
+
             formatted += ch;
             continue;
         }
@@ -193,12 +198,7 @@ function cssbeautify(style, opt) {
 
             // '{' starts the ruleset.
             if (ch === '{') {
-                depth += 1;
-                formatted = trimRight(formatted);
-                formatted += openbrace;
-                if (ch2 !== '\n') {
-                    formatted += '\n';
-                }
+                openBlock();
                 state = State.Ruleset;
                 continue;
             }
