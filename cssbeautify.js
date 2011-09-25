@@ -28,7 +28,7 @@ function cssbeautify(style, opt) {
 
     var options, index = 0, length = style.length, formatted = '',
         ch, ch2, str, state, State, depth, quote, comment,
-        openbrace = ' {',
+        openbracesuffix = true,
         trimRight;
 
     options = arguments.length > 1 ? opt : {};
@@ -36,7 +36,7 @@ function cssbeautify(style, opt) {
         options.indent = '    ';
     }
     if (typeof options.openbrace === 'string') {
-        openbrace = (options.openbrace === 'end-of-line') ? ' {' : '\n{';
+        openbracesuffix = (options.openbrace === 'end-of-line');
     }
 
     function isWhitespace(c) {
@@ -63,12 +63,18 @@ function cssbeautify(style, opt) {
     }
 
     function openBlock() {
-        depth += 1;
         formatted = trimRight(formatted);
-        formatted += openbrace;
+        if (openbracesuffix) {
+            formatted += ' {';
+        } else {
+            formatted += '\n';
+            appendIndent();
+            formatted += '{';
+        }
         if (ch2 !== '\n') {
             formatted += '\n';
         }
+        depth += 1;
     }
 
     function closeBlock() {
