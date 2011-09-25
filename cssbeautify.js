@@ -55,6 +55,13 @@ function cssbeautify(style, opt) {
             '-_*.:'.indexOf(c) >= 0;
     }
 
+    function appendIndent() {
+        var i;
+        for (i = depth; i > 0; i -= 1) {
+            formatted += options.indent;
+        }
+    }
+
     function openBlock() {
         depth += 1;
         formatted = trimRight(formatted);
@@ -67,14 +74,9 @@ function cssbeautify(style, opt) {
     function closeBlock() {
         depth -= 1;
         formatted = trimRight(formatted);
-        formatted += '\n}';
-    }
-
-    function appendIndent() {
-        var i;
-        for (i = depth; i > 0; i -= 1) {
-            formatted += options.indent;
-        }
+        formatted += '\n';
+        appendIndent();
+        formatted += '}';
     }
 
     if (String.prototype.trimRight) {
@@ -91,11 +93,12 @@ function cssbeautify(style, opt) {
     State = {
         Start: 0,
         AtRule: 1,
-        Selector: 2,
-        Ruleset: 3,
-        Property: 4,
-        Separator: 5,
-        Expression: 6
+        Block: 2,
+        Selector: 3,
+        Ruleset: 4,
+        Property: 5,
+        Separator: 6,
+        Expression: 7
     };
 
     depth = 0;
@@ -200,7 +203,47 @@ function cssbeautify(style, opt) {
             // '{' starts a block
             if (ch === '{') {
                 openBlock();
+                state = State.Block;
+                continue;
+            }
+
+            formatted += ch;
+            continue;
+        }
+
+        if (state === State.Block) {
+
+            // Selector
+            if (isName(ch)) {
+
+                // Clear trailing whitespaces and linefeeds.
+                str = trimRight(formatted);
+
+                // Insert blank line if necessary.
+                if (str.charAt(str.length - 1) === '}') {
+                    formatted = str + '\n\n';
+                } else {
+                    // After block comment, keep all the linefeeds but
+                    // start from the first column (remove whitespaces prefix).
+                    while (true) {
+                        ch2 = formatted.charAt(formatted.length - 1);
+                        if (ch2 !== ' ' && ch2.charCodeAt(0) !== 9) {
+                            break;
+                        }
+                        formatted = formatted.substr(0, formatted.length - 1);
+                    }
+                }
+
+                appendIndent();
+                formatted += ch;
                 state = State.Selector;
+                continue;
+            }
+
+            // '}' resets the state.
+            if (ch === '}') {
+                closeBlock();
+                state = State.Start;
                 continue;
             }
 
@@ -235,7 +278,7 @@ function cssbeautify(style, opt) {
                 closeBlock();
                 state = State.Start;
                 if (depth > 0) {
-                    state = State.Selector;
+                    state = State.Block;
                 }
                 continue;
             }
@@ -275,12 +318,10 @@ function cssbeautify(style, opt) {
 
             // '}' finishes the ruleset.
             if (ch === '}') {
-                depth -= 1;
-                formatted = trimRight(formatted);
-                formatted += '\n}';
+                closeBlock();
                 state = State.Start;
                 if (depth > 0) {
-                    state = State.Selector;
+                    state = State.Block;
                 }
                 continue;
             }
@@ -310,12 +351,10 @@ function cssbeautify(style, opt) {
 
             // '}' finishes the ruleset.
             if (ch === '}') {
-                depth -= 1;
-                formatted = trimRight(formatted);
-                formatted += '\n}';
+                closeBlock();
                 state = State.Start;
                 if (depth > 0) {
-                    state = State.Selector;
+                    state = State.Block;
                 }
                 continue;
             }
