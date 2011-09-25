@@ -360,6 +360,34 @@ h1 {
 
 </div>
 
+<div>
+
+<p id="title">Test keyframes:</p>
+
+<p>Raw CSS</p>
+
+<pre id="keyframes" class="source">
+@-webkit-keyframes anim {
+0% { -webkit-transform: translate3d(0px, 0px, 0px); }
+100% { -webkit-transform: translate3d(150px, 0px, 0px) }}
+</pre>
+
+<p>Baseline reference</p>
+
+<pre id="keyframes" class="ref">
+@-webkit-keyframes anim {
+    0% {
+        -webkit-transform: translate3d(0px, 0px, 0px);
+    }
+
+    100% {
+        -webkit-transform: translate3d(150px, 0px, 0px)
+    }
+}
+</pre>
+
+</div>
+
 <script>
 var total = 0, failures = 0, data = {},
     list, i, e, id, cls, name, test;
