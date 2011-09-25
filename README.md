@@ -1,6 +1,6 @@
 # CSS Beautify #
 
-CSS Beautify is a JavaScript implementation of reindenter and reformatter for styles written in CSS.
+CSS Beautify is a JavaScript implementation of reindenter and reformatter for styles written in [CSS](http://www.w3.org/Style/CSS/).
 
 Given the following style:
 

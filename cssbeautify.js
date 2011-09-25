@@ -22,12 +22,12 @@
  THE SOFTWARE.
 */
 
-/*jslint continue: true, indent: 4 */
+/*jslint continue: true, sloppy: true, indent: 4 */
 
 function cssbeautify(style, opt) {
-    "use strict";
+
     var options, index = 0, length = style.length, formatted = '',
-        ch, ch2, str, state, State, quote, comment,
+        ch, ch2, str, state, State, depth, quote, comment,
         openbrace = ' {',
         trimRight;
 
@@ -47,6 +47,38 @@ function cssbeautify(style, opt) {
         return '\'"'.indexOf(c) >= 0;
     }
 
+    // FIXME: handle Unicode characters
+    function isName(c) {
+        return (ch >= 'a' && ch <= 'z') ||
+            (ch >= 'A' && ch <= 'Z') ||
+            (ch >= '0' && ch <= '9') ||
+            '-_*.:'.indexOf(c) >= 0;
+    }
+
+    function appendIndent() {
+        var i;
+        for (i = depth; i > 0; i -= 1) {
+            formatted += options.indent;
+        }
+    }
+
+    function openBlock() {
+        depth += 1;
+        formatted = trimRight(formatted);
+        formatted += openbrace;
+        if (ch2 !== '\n') {
+            formatted += '\n';
+        }
+    }
+
+    function closeBlock() {
+        depth -= 1;
+        formatted = trimRight(formatted);
+        formatted += '\n';
+        appendIndent();
+        formatted += '}';
+    }
+
     if (String.prototype.trimRight) {
         trimRight = function (s) {
             return s.trimRight();
@@ -61,12 +93,15 @@ function cssbeautify(style, opt) {
     State = {
         Start: 0,
         AtRule: 1,
-        Selector: 2,
-        Block: 3,
-        PropertyName: 4,
-        Separator: 5,
-        PropertyValue: 6
+        Block: 2,
+        Selector: 3,
+        Ruleset: 4,
+        Property: 5,
+        Separator: 6,
+        Expression: 7
     };
+
+    depth = 0;
     state = State.Start;
     comment = false;
 
@@ -78,7 +113,7 @@ function cssbeautify(style, opt) {
         ch2 = style.charAt(index + 1);
         index += 1;
 
-        // String literal
+        // Inside a string literal?
         if (isQuote(quote)) {
             formatted += ch;
             if (ch === quote) {
@@ -89,6 +124,13 @@ function cssbeautify(style, opt) {
                 formatted += ch2;
                 index += 1;
             }
+            continue;
+        }
+
+        // Starting a string literal?
+        if (isQuote(ch)) {
+            formatted += ch;
+            quote = ch;
             continue;
         }
 
@@ -121,14 +163,7 @@ function cssbeautify(style, opt) {
             }
 
             // Selector or at-rule
-            // FIXME: handle Unicode characters
-            if ((ch >= 'a' && ch <= 'z') ||
-                    (ch >= 'A' && ch <= 'Z') ||
-                    (ch >= '0' && ch <= '9') ||
-                    (ch === '-') || (ch === '_') ||
-                    (ch === '-') || (ch === '_') ||
-                    (ch === '*') || (ch === '@') ||
-                    (ch === '.') || (ch === ':')) {
+            if (isName(ch) || (ch === '@')) {
 
                 // Clear trailing whitespaces and linefeeds.
                 str = trimRight(formatted);
@@ -157,128 +192,181 @@ function cssbeautify(style, opt) {
         }
 
         if (state === State.AtRule) {
-            // Continue until we hit semicolon
+
+            // ';' terminates a statement.
             if (ch === ';') {
                 formatted += ch;
                 state = State.Start;
                 continue;
             }
-            // or a block
+
+            // '{' starts a block
             if (ch === '{') {
-                formatted = trimRight(formatted);
-                formatted += openbrace;
-                if (ch2 !== '\n') {
-                    formatted += '\n';
-                }
+                openBlock();
+                state = State.Block;
                 continue;
             }
+
+            formatted += ch;
+            continue;
+        }
+
+        if (state === State.Block) {
+
+            // Selector
+            if (isName(ch)) {
+
+                // Clear trailing whitespaces and linefeeds.
+                str = trimRight(formatted);
+
+                // Insert blank line if necessary.
+                if (str.charAt(str.length - 1) === '}') {
+                    formatted = str + '\n\n';
+                } else {
+                    // After block comment, keep all the linefeeds but
+                    // start from the first column (remove whitespaces prefix).
+                    while (true) {
+                        ch2 = formatted.charAt(formatted.length - 1);
+                        if (ch2 !== ' ' && ch2.charCodeAt(0) !== 9) {
+                            break;
+                        }
+                        formatted = formatted.substr(0, formatted.length - 1);
+                    }
+                }
+
+                appendIndent();
+                formatted += ch;
+                state = State.Selector;
+                continue;
+            }
+
+            // '}' resets the state.
+            if (ch === '}') {
+                closeBlock();
+                state = State.Start;
+                continue;
+            }
+
             formatted += ch;
             continue;
         }
 
         if (state === State.Selector) {
 
-            // Handle string literal
-            if (isQuote(ch)) {
-                formatted += ch;
-                quote = ch;
+            // '{' starts the ruleset.
+            if (ch === '{') {
+                openBlock();
+                state = State.Ruleset;
                 continue;
             }
 
-            // Continue until we hit '{'
-            if (ch === '{') {
-                formatted = trimRight(formatted);
-                formatted += openbrace;
-                if (ch2 !== '\n') {
-                    formatted += '\n';
-                }
-                state = State.Block;
-            } else {
-                formatted += ch;
-            }
-            continue;
-        }
-
-        if (state === State.Block) {
-            // Continue until we hit '}'
+            // '}' resets the state.
             if (ch === '}') {
-                formatted = trimRight(formatted);
-                formatted += '\n}';
+                closeBlock();
                 state = State.Start;
                 continue;
             }
+
+            formatted += ch;
+            continue;
+        }
+
+        if (state === State.Ruleset) {
+
+            // '}' finishes the ruleset.
+            if (ch === '}') {
+                closeBlock();
+                state = State.Start;
+                if (depth > 0) {
+                    state = State.Block;
+                }
+                continue;
+            }
+
             // Make sure there is no blank line or trailing spaces inbetween
             if (ch === '\n') {
                 formatted = trimRight(formatted);
                 formatted += '\n';
                 continue;
             }
+
             // property name
             if (!isWhitespace(ch)) {
                 formatted = trimRight(formatted);
                 formatted += '\n';
-                formatted += options.indent;
+                appendIndent();
                 formatted += ch;
-                state = State.PropertyName;
+                state = State.Property;
                 continue;
             }
             formatted += ch;
             continue;
         }
 
-        if (state === State.PropertyName) {
-            // Continue until we hit ':'
+        if (state === State.Property) {
+
+            // ':' concludes the property.
             if (ch === ':') {
                 formatted = trimRight(formatted);
                 formatted += ': ';
-                state = State.Separator;
+                state = State.Expression;
+                if (isWhitespace(ch2)) {
+                    state = State.Separator;
+                }
                 continue;
             }
-            // or until we hit '}'
+
+            // '}' finishes the ruleset.
             if (ch === '}') {
-                formatted = trimRight(formatted);
-                formatted += '\n}';
+                closeBlock();
                 state = State.Start;
+                if (depth > 0) {
+                    state = State.Block;
+                }
                 continue;
             }
+
             formatted += ch;
             continue;
         }
 
         if (state === State.Separator) {
+
+            // Non-whitespace starts the expression.
             if (!isWhitespace(ch)) {
                 formatted += ch;
-                if (isQuote(ch)) {
-                    state = State.PropertyValue;
-                    quote = ch;
-                    continue;
-                }
-                state = State.PropertyValue;
+                state = State.Expression;
                 continue;
             }
+
+            // Anticipate string literal.
+            if (isQuote(ch2)) {
+                state = State.Expression;
+            }
+
             continue;
         }
 
-        if (state === State.PropertyValue) {
-            if (isQuote(ch)) {
-                formatted += ch;
-                quote = ch;
+        if (state === State.Expression) {
+
+            // '}' finishes the ruleset.
+            if (ch === '}') {
+                closeBlock();
+                state = State.Start;
+                if (depth > 0) {
+                    state = State.Block;
+                }
                 continue;
             }
-            // Continue until we hit ';''
+
+            // ';' completes the declaration.
             if (ch === ';') {
                 formatted = trimRight(formatted);
                 formatted += ';\n';
-                state = State.Block;
+                state = State.Ruleset;
                 continue;
             }
-            // or until we hit '}'
-            if (ch === '}') {
-                formatted = trimRight(formatted);
-                formatted += '\n}';
-                state = State.Start;
-                continue;
-            }
+
             formatted += ch;
             continue;
         }
