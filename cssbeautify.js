@@ -52,7 +52,7 @@ function cssbeautify(style, opt) {
         return (ch >= 'a' && ch <= 'z') ||
             (ch >= 'A' && ch <= 'Z') ||
             (ch >= '0' && ch <= '9') ||
-            '-_*.:'.indexOf(c) >= 0;
+            '-_*.:#'.indexOf(c) >= 0;
     }
 
     function appendIndent() {
