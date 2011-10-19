@@ -1,0 +1,40 @@
+@import url(http://fonts.googleapis.com/css?family=Maven+Pro);
+
+p, ul, li {
+  font-family: 'Maven Pro', Helvetica, Arial, sans-serif;
+}
+
+#raw {
+    margin: 5px;
+}
+
+#beautified {
+    color: black;
+    background-color: #eee;
+}
+
+textarea {
+    font-family: Monaco, Consolas, "Lucida Console", monospace;
+    padding: 7px;
+}
+
+#container {
+    width: 100%;
+}
+
+#content {
+    float: left;
+    width: 50%;
+}
+
+#info {
+    float: right;
+    width: 40%;
+    padding-top: 50px;
+    padding-right: 20px;
+  }
+
+input {
+    margin-left: 20px;
+}
+</style>
