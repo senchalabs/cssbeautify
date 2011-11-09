@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>CSS Beautifier (by Sencha)</title>
+    <title>CSS Beautify</title>
     <link rel="stylesheet" type="text/css" href="style.css"/>
     <script src="cssbeautify.js" charset="utf-8"></script>
     <script type="text/javascript">
@@ -35,40 +35,44 @@
     </script>
 </head>
 <body>
-  <div id="container">
-  <div id="content">
-    <p>Type any unformatted CSS:</p>
-    <p><textarea id="raw" cols="70" rows="15" spellcheck="false" onChange='format()' onKeyDown='format()'>menu{color:red} navigation{background-color:#333}</textarea></p>
-    <p>Beautified CSS:</p>
-    <p><textarea id="beautified" cols="70" rows="15" readonly></textarea></p>
-  </div>
-  <div id="info">
-    <p>Formatting rules:</p>
+<div class="container">
+
+    <h1>CSS Beautify <small>automatically formats your style to be consistent and easy to read</small></h1>
     <ul>
-        <li>Comments are preserved</li>
         <li>Only one blank line between two rulesets</li>
         <li>Closed curly brace is at its own line</li>
         <li>There is no empty line between declarations inside a ruleset</li>
-        <li>No space between property name and colon</li>
-        <li>One space between colon and property value</li>
+        <li>No space between the property name and colon</li>
+        <li>One space between colon and the property value</li>
+        <li>Comments are preserved</li>
     </ul>
-    <p>Options (more coming soon):</p>
-    <div style="border: 1px solid #ddd; padding-left: 5px">
-    <p>Indent with<br>
-    <label><input checked type="radio" name="indent" id="spaces" value="spaces" onChange='format()'>spaces</label><br>
-    <label><input type="radio" name="indent" id="tab" value="tab" onChange='format()'>tab</label>
-    </p>
-    <p>Place open curly brace<br>
-    <label><input checked type="radio" name="openbrace" id="openbrace-end-of-line" onChange='format()'>at the end-of-line</label><br>
-    <label><input type="radio" name="openbrace" id="openbrace-separate-line" onChange='format()'>in a separate line</label>
-    </p>
+
+    <div class="raw">
+        <h3>Type any unformatted CSS:</h3>
+        <textarea id="raw" rows="22" autofocus="autofocus" spellcheck="false" onChange='format()' onKeyDown='format()'>menu{color:red} navigation{background-color:#333}</textarea>
     </div>
-    <p>Not handled yet</p>
-    <ul>
-        <li>Optionally separate each selector and put it in its own line</li>
-        <li>Custom number of spaces</li>
-    </ul>
-  </div>
+
+    <div class="formatted">
+        <h3>Beautified CSS:</h3>
+        <textarea id="beautified" rows="22" readonly></textarea>
+    </div>
+
+    <div class="options">
+        <h3>Options:</h3>
+        <p>Indent with<br>
+        <label><input checked type="radio" name="indent" id="spaces" value="spaces" onChange='format()'>spaces</label><br>
+        <label><input type="radio" name="indent" id="tab" value="tab" onChange='format()'>tab</label>
+        </p>
+        <p>Curly brace:<br>
+        <label><input checked type="radio" name="openbrace" id="openbrace-end-of-line" onChange='format()'>end-of-line</label><br>
+        <label><input type="radio" name="openbrace" id="openbrace-separate-line" onChange='format()'>its own line</label>
+        </p>
+    </div>
+
+    <br clear="all"/>
+    <div class="footer"><strong>CSS Beautify</strong> is an open-source project from <a href="http://sencha.com">Sencha</a>.<br>Check the repository at <a href="http://github.com/senchalabs/cssbeautify">github.com/senchalabs/cssbeautify</a>.</div>
+
+</div>
   <p><a href="http://github.com/senchalabs/cssbeautify"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://d3nwyuy0nl342s.cloudfront.net/img/abad93f42020b733148435e2cd92ce15c542d320/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub"></a></p>
   </div>
   <script>format();</script>
