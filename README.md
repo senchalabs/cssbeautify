@@ -19,6 +19,8 @@ CSS Beautify will produce:
 
 Try it online at [http://senchalabs.github.com/cssbeautify](http://senchalabs.github.com/cssbeautify).
 
+For more examples, see also its [test suite](http://senchalabs.github.com/cssbeautify/test.htm).
+
 ## Using cssbeautify() function ##
 
 Since CSS Beautify is written in pure JavaScript, it can run anywhere that JavaScript can run.
