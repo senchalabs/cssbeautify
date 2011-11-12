@@ -2,13 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Unit tests for CSS Beautifier</title>
+<title>Test Suite for CSS Beautify</title>
+<link rel="stylesheet" type="text/css" href="style.css"/>
 <script src="cssbeautify.js" charset="utf-8"></script>
 <style>
-p#title {
-    font-weight: bold;
-}
-
 pre {
     margin-left: 20px;
     padding: 5px;
@@ -35,16 +32,20 @@ pre {
 </head>
 <body>
 
+<div class="container">
+
+<h1>Test Suite <small>for CSS Beautify</small></h1>
+
 <!--
 Every test data consists of a pair of pre with matching ids.
 The test has the 'source' class and the baseline/reference has the 'ref' class.
 -->
 
-<div>
+<p id="result">Running the tests...</p>
 
-<p id="title">Test simple style:</p>
+<h2>Simple style</h2>
 
-<p>Raw CSS</p>
+<pre id="simple" class="status"></pre>
 
 <pre id="simple" class="source">
 menu { color: blue; }
@@ -76,13 +77,9 @@ b {
 }
 </pre>
 
-</div>
+<h2>Block comment</h2>
 
-<div>
-
-<p id="title">Test line comment and block comment:</p>
-
-<p>Raw CSS</p>
+<pre id="comment" class="status"></pre>
 
 <pre id="comment" class="source">
 /* line comment */
@@ -132,13 +129,9 @@ invisible {
 }
 </pre>
 
-</div>
+<h2>Indentation</h2>
 
-<div>
-
-<p id="title">Test correction of wrong indentation:</p>
-
-<p>Raw CSS</p>
+<pre id="indent" class="status"></pre>
 
 <pre id="indent" class="source">
      navigation {
@@ -154,13 +147,9 @@ navigation {
 }
 </pre>
 
-</div>
+<h2>Blank lines and spaces</h2>
 
-<div>
-
-<p id="title">Test fixing blank lines and spaces:</p>
-
-<p>Raw CSS</p>
+<pre id="spaces" class="status"></pre>
 
 <pre id="spaces" class="source">
 /* only one blank line between */
@@ -235,13 +224,9 @@ footer {
 }
 </pre>
 
-</div>
+<h2>Quoted string</h2>
 
-<div>
-
-<p id="title">Test ignoring quoted string inside property value:</p>
-
-<p>Raw CSS</p>
+<pre id="string" class="status"></pre>
 
 <pre id="string" class="source">
 nav:after{content:'}'}
@@ -260,13 +245,9 @@ nav:before {
 }
 </pre>
 
-</div>
+<h2>Selectors</h2>
 
-<div>
-
-<p id="title">Test various corner cases of selector:</p>
-
-<p>Raw CSS</p>
+<pre id="selector" class="status"></pre>
 
 <pre id="selector" class="source">
 * { border: 0px solid blue; }
@@ -295,13 +276,9 @@ a[id="\"foo"] {
 }
 </pre>
 
-</div>
+<h2>@import directive</h2>
 
-<div>
-
-<p id="title">Test import directive:</p>
-
-<p>Raw CSS</p>
+<pre id="import" class="status"></pre>
 
 <pre id="import" class="source">
 menu{background-color:red} @import url('foobar.css') screen;
@@ -322,13 +299,9 @@ nav {
 }
 </pre>
 
-</div>
+<h2>@media directive</h2>
 
-<div>
-
-<p id="title">Test media directive:</p>
-
-<p>Raw CSS</p>
+<pre id="media" class="status"></pre>
 
 <pre id="media" class="source">
 @import "subs.css";
@@ -363,13 +336,9 @@ h1 {
 
 </pre>
 
-</div>
+<h2>Animation keyframes</h2>
 
-<div>
-
-<p id="title">Test keyframes:</p>
-
-<p>Raw CSS</p>
+<pre id="keyframes" class="status"></pre>
 
 <pre id="keyframes" class="source">
 @-webkit-keyframes anim {
@@ -407,12 +376,14 @@ for (i = 0; i < list.length; i += 1) {
         if (cls === 'source') {
           data[id] = data[id] || {};
           data[id].source = e.innerHTML;
-          data[id].el = e.parentNode;
         }
         if (cls === 'ref') {
           data[id] = data[id] || {};
           data[id].ref = e.innerHTML.replace(/^\s+/, '').replace(/\s+$/, '');
-          data[id].el = e.parentNode;
+        }
+        if (cls === 'status') {
+          data[id] = data[id] || {};
+          data[id].status = e;
         }
     }
 }
@@ -425,29 +396,19 @@ for (name in data) {
         test.result = cssbeautify(test.source).replace(/^\s+/, '').replace(/\s+$/, '');
         if (test.result !== test.ref) {
             failures += 1;
-            e = document.createElement('p');
-            e.textContent = 'Actual';
-            data[name].el.appendChild(e);
             e = document.createElement('pre');
             e.setAttribute('class', 'result');
             e.setAttribute('id', 'fail');
             e.textContent = test.result;
-            data[name].el.appendChild(e);
-            e = document.createElement('p');
-            e.textContent = 'Status: FAILED';
-            e.setAttribute('class', 'fail');
-            data[name].el.appendChild(e);
+            data[name].status.textContent = 'Status: FAIL';
+            data[name].status.appendChild(e);
         } else {
-            e = document.createElement('p');
-            e.textContent = 'Status: PASS';
-            data[name].el.appendChild(e);
+            data[name].status.textContent = 'Status: PASS';
         }
     }
 }
 
-e = document.createElement('p');
-e.textContent = total + ' tests, ' + failures + ' failure(s).';
-document.body.insertBefore(e, document.body.firstChild);
+document.getElementById('result').textContent = 'Result: ' + total + ' tests, ' + failures + ' failure(s).';
 </script>
 </body>
 </html>
