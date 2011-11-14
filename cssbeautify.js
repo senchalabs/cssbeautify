@@ -22,9 +22,10 @@
  THE SOFTWARE.
 */
 
-/*jslint continue: true, sloppy: true, indent: 4 */
+/*jslint continue: true, indent: 4 */
 
 function cssbeautify(style, opt) {
+    'use strict';
 
     var options, index = 0, length = style.length, formatted = '',
         ch, ch2, str, state, State, depth, quote, comment,
