@@ -17,9 +17,9 @@ CSS Beautify will produce:
         background-color: #333
     }
 
-Try it online at [http://senchalabs.github.com/cssbeautify](http://senchalabs.github.com/cssbeautify).
+Try it online at [cssbeautify.com](http://cssbeautify.com).
 
-For more examples, see also its [test suite](http://senchalabs.github.com/cssbeautify/test.htm).
+For more examples, see also its [test suite](http://cssbeautify.com/test.htm).
 
 ## Using cssbeautify() function ##
 
