@@ -41,11 +41,11 @@ function cssbeautify(style, opt) {
     }
 
     function isWhitespace(c) {
-        return ' \t\n\r\f'.indexOf(c) >= 0;
+        return (c === ' ') || (c === '\n') || (c === '\t') || (c === '\r') || (c === '\f');
     }
 
     function isQuote(c) {
-        return '\'"'.indexOf(c) >= 0;
+        return (c === '\'') || (c === '"');
     }
 
     // FIXME: handle Unicode characters
