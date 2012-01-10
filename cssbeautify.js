@@ -27,7 +27,7 @@
 function cssbeautify(style, opt) {
     'use strict';
 
-    var options, index = 0, length = style.length, formatted = '',
+    var options, index = 0, length = style.length, blocks, formatted = '',
         ch, ch2, str, state, State, depth, quote, comment,
         openbracesuffix = true,
         trimRight;
@@ -41,11 +41,11 @@ function cssbeautify(style, opt) {
     }
 
     function isWhitespace(c) {
-        return ' \t\n\r\f'.indexOf(c) >= 0;
+        return (c === ' ') || (c === '\n') || (c === '\t') || (c === '\r') || (c === '\f');
     }
 
     function isQuote(c) {
-        return '\'"'.indexOf(c) >= 0;
+        return (c === '\'') || (c === '"');
     }
 
     // FIXME: handle Unicode characters
@@ -84,6 +84,8 @@ function cssbeautify(style, opt) {
         formatted += '\n';
         appendIndent();
         formatted += '}';
+        blocks.push(formatted);
+        formatted = '';
     }
 
     if (String.prototype.trimRight) {
@@ -111,6 +113,7 @@ function cssbeautify(style, opt) {
     depth = 0;
     state = State.Start;
     comment = false;
+    blocks = [];
 
     // We want to deal with LF (\n) only
     style = style.replace(/\r\n/g, '\n');
@@ -175,21 +178,28 @@ function cssbeautify(style, opt) {
                 // Clear trailing whitespaces and linefeeds.
                 str = trimRight(formatted);
 
-                // After finishing a ruleset or directive statement,
-                // there should be one blank line.
-                if (str.charAt(str.length - 1) === '}' ||
-                        str.charAt(str.length - 1) === ';') {
-
-                    formatted = str + '\n\n';
+                if (str.length === 0) {
+                    // If we have empty string after removing all the trailing
+                    // spaces, that means we are right after a block.
+                    // Ensure a blank line as the separator.
+                    formatted = '\n\n';
                 } else {
-                    // After block comment, keep all the linefeeds but
-                    // start from the first column (remove whitespaces prefix).
-                    while (true) {
-                        ch2 = formatted.charAt(formatted.length - 1);
-                        if (ch2 !== ' ' && ch2.charCodeAt(0) !== 9) {
-                            break;
+                    // After finishing a ruleset or directive statement,
+                    // there should be one blank line.
+                    if (str.charAt(str.length - 1) === '}' ||
+                            str.charAt(str.length - 1) === ';') {
+
+                        formatted = str + '\n\n';
+                    } else {
+                        // After block comment, keep all the linefeeds but
+                        // start from the first column (remove whitespaces prefix).
+                        while (true) {
+                            ch2 = formatted.charAt(formatted.length - 1);
+                            if (ch2 !== ' ' && ch2.charCodeAt(0) !== 9) {
+                                break;
+                            }
+                            formatted = formatted.substr(0, formatted.length - 1);
                         }
-                        formatted = formatted.substr(0, formatted.length - 1);
                     }
                 }
                 formatted += ch;
@@ -226,18 +236,25 @@ function cssbeautify(style, opt) {
                 // Clear trailing whitespaces and linefeeds.
                 str = trimRight(formatted);
 
-                // Insert blank line if necessary.
-                if (str.charAt(str.length - 1) === '}') {
-                    formatted = str + '\n\n';
+                if (str.length === 0) {
+                    // If we have empty string after removing all the trailing
+                    // spaces, that means we are right after a block.
+                    // Ensure a blank line as the separator.
+                    formatted = '\n\n';
                 } else {
-                    // After block comment, keep all the linefeeds but
-                    // start from the first column (remove whitespaces prefix).
-                    while (true) {
-                        ch2 = formatted.charAt(formatted.length - 1);
-                        if (ch2 !== ' ' && ch2.charCodeAt(0) !== 9) {
-                            break;
+                    // Insert blank line if necessary.
+                    if (str.charAt(str.length - 1) === '}') {
+                        formatted = str + '\n\n';
+                    } else {
+                        // After block comment, keep all the linefeeds but
+                        // start from the first column (remove whitespaces prefix).
+                        while (true) {
+                            ch2 = formatted.charAt(formatted.length - 1);
+                            if (ch2 !== ' ' && ch2.charCodeAt(0) !== 9) {
+                                break;
+                            }
+                            formatted = formatted.substr(0, formatted.length - 1);
                         }
-                        formatted = formatted.substr(0, formatted.length - 1);
                     }
                 }
 
@@ -382,6 +399,8 @@ function cssbeautify(style, opt) {
         // infinite loop).
         formatted += ch;
     }
+
+    formatted = blocks.join('') + formatted;
 
     return formatted;
 }
