@@ -333,7 +333,6 @@ h1 {color: red; }
 h1 {
     color: red;
 }
-
 </pre>
 
 <h2>Animation keyframes</h2>
@@ -379,7 +378,7 @@ for (i = 0; i < list.length; i += 1) {
         }
         if (cls === 'ref') {
           data[id] = data[id] || {};
-          data[id].ref = e.innerHTML.replace(/^\s+/, '').replace(/\s+$/, '');
+          data[id].ref = e.innerHTML;
         }
         if (cls === 'status') {
           data[id] = data[id] || {};
@@ -393,7 +392,7 @@ for (name in data) {
     if (data.hasOwnProperty(name)) {
         total += 1;
         test = data[name];
-        test.result = cssbeautify(test.source).replace(/^\s+/, '').replace(/\s+$/, '');
+        test.result = cssbeautify(test.source);
         if (test.result !== test.ref) {
             failures += 1;
             e = document.createElement('pre');
