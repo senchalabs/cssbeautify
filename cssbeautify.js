@@ -165,6 +165,12 @@ function cssbeautify(style, opt) {
 
         if (state === State.Start) {
 
+            if (blocks.length === 0) {
+                if (isWhitespace(ch) && formatted.length === 0) {
+                    continue;
+                }
+            }
+
             // Copy white spaces and control characters
             if (ch <= ' ' || ch.charCodeAt(0) >= 128) {
                 state = State.Start;
@@ -182,7 +188,9 @@ function cssbeautify(style, opt) {
                     // If we have empty string after removing all the trailing
                     // spaces, that means we are right after a block.
                     // Ensure a blank line as the separator.
-                    formatted = '\n\n';
+                    if (blocks.length > 0) {
+                        formatted = '\n\n';
+                    }
                 } else {
                     // After finishing a ruleset or directive statement,
                     // there should be one blank line.
@@ -240,7 +248,9 @@ function cssbeautify(style, opt) {
                     // If we have empty string after removing all the trailing
                     // spaces, that means we are right after a block.
                     // Ensure a blank line as the separator.
-                    formatted = '\n\n';
+                    if (blocks.length > 0) {
+                        formatted = '\n\n';
+                    }
                 } else {
                     // Insert blank line if necessary.
                     if (str.charAt(str.length - 1) === '}') {
