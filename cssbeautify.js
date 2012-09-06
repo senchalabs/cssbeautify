@@ -23,7 +23,8 @@
  THE SOFTWARE.
 */
 
-/*jslint continue: true, indent: 4, node: true, browser: true */
+/*jslint continue: true, indent: 4 */
+/*global exports:true, module:true, window:true */
 
 (function () {
 
