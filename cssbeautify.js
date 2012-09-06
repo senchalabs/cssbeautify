@@ -1,4 +1,5 @@
 /*
+ Copyright (C) 2012 Sencha Inc.
  Copyright (C) 2011 Sencha Inc.
 
  Author: Ariya Hidayat.
@@ -22,10 +23,11 @@
  THE SOFTWARE.
 */
 
-/*jslint continue: true, indent: 4 */
+/*jslint continue: true, indent: 4, node: true, browser: true */
 
-function cssbeautify(style, opt) {
-    'use strict';
+(function() {
+
+    function cssbeautify(style, opt) {
 
     var options, index = 0, length = style.length, blocks, formatted = '',
         ch, ch2, str, state, State, depth, quote, comment,
@@ -413,4 +415,14 @@ function cssbeautify(style, opt) {
     formatted = blocks.join('') + formatted;
 
     return formatted;
-}
+    };
+
+    if (typeof exports !== 'undefined') {
+        // Node.js module.
+        module.exports = exports = cssbeautify;
+    } else if (typeof window === 'object') {
+        // Browser loading.
+        window.cssbeautify = cssbeautify;
+    }
+
+})();
