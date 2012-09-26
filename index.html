@@ -5,34 +5,7 @@
     <title>CSS Beautify</title>
     <link rel="stylesheet" type="text/css" href="style.css"/>
     <script src="cssbeautify.js" charset="utf-8"></script>
-    <script type="text/javascript">
-    var formatId;
-    function format() {
-        if (formatId) {
-            window.clearTimeout(formatId);
-        }
-        formatId = window.setTimeout(function () {
-            var options, raw, beautified;
-
-            options = {
-                indent: '    '
-            };
-
-            if (document.getElementById('tab').checked) {
-                options.indent = '\t';
-            }
-
-            if (document.getElementById('openbrace-separate-line').checked) {
-                options.openbrace = 'separate-line';
-            }
-
-            raw = document.getElementById('raw').value;
-            beautified = cssbeautify(raw, options);
-            document.getElementById('beautified').value = beautified;
-            formatId = undefined;
-        }, 42);
-    }
-    </script>
+    <script src="format.js" charset="utf-8"></script>
 </head>
 <body>
 <div class="container">
@@ -75,7 +48,6 @@
 </div>
   <p><a href="http://github.com/senchalabs/cssbeautify"><img style="position: absolute; top: 0; right: 0; border: 0;" src="images/ribbon.png" alt="Fork me on GitHub"></a></p>
   </div>
-  <script>format();</script>
 
   <script type="text/javascript">
 
