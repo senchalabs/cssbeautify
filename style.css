@@ -109,3 +109,11 @@ textarea {
     text-align: center;
 }
 
+.CodeMirror {
+    padding: 0;
+    border: 1px solid #bbb;
+}
+
+.CodeMirror-scroll {
+    height: 320px;
+}
