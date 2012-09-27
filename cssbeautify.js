@@ -112,7 +112,8 @@
             Ruleset: 4,
             Property: 5,
             Separator: 6,
-            Expression: 7
+            Expression: 7,
+            URL: 8
         };
 
         depth = 0;
@@ -407,7 +408,30 @@
                 }
 
                 formatted += ch;
+
+                if (ch === '(') {
+                    if (formatted.charAt(formatted.length - 2) === 'l' &&
+                            formatted.charAt(formatted.length - 3) === 'r' &&
+                            formatted.charAt(formatted.length - 4) === 'u') {
+
+                        // URL starts with '(' and closes with ')'.
+                        state = State.URL;
+                        continue;
+                    }
+                }
+
                 continue;
+            }
+
+            if (state === State.URL) {
+
+
+                // ')' finishes the URL (only if it is not escaped).
+                if (ch === ')' && formatted.charAt(formatted.length - 1 !== '\\')) {
+                    formatted += ch;
+                    state = State.Expression;
+                    continue;
+                }
             }
 
             // The default action is to copy the character (to prevent
