@@ -47,7 +47,8 @@ window.onload = function () {
         lineNumbers: true,
         matchBrackets: false,
         lineWrapping: true,
-        tabSize: 8
+        tabSize: 8,
+        onChange: format
     });
 
     viewer = CodeMirror.fromTextArea(document.getElementById("beautified"), {
