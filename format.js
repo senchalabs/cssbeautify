@@ -1,6 +1,6 @@
 /*global cssbeautify:true, document:true, window:true */
 
-var formatId;
+var editor, viewer, formatId;
 
 function format() {
     'use strict';
@@ -22,15 +22,42 @@ function format() {
             options.openbrace = 'separate-line';
         }
 
-        raw = document.getElementById('raw').value;
+        if (typeof editor === 'undefined') {
+            raw = document.getElementById('raw').value;
+        } else {
+            raw = editor.getValue();
+        }
+
         beautified = cssbeautify(raw, options);
-        document.getElementById('beautified').value = beautified;
+
+        if (typeof viewer === 'undefined') {
+            document.getElementById('beautified').value = beautified;
+        } else {
+            viewer.setValue(beautified);
+        }
+
         formatId = undefined;
     }, 42);
 }
 
 window.onload = function () {
     'use strict';
+
+    editor = CodeMirror.fromTextArea(document.getElementById("raw"), {
+        lineNumbers: true,
+        matchBrackets: false,
+        lineWrapping: true,
+        tabSize: 8
+    });
+
+    viewer = CodeMirror.fromTextArea(document.getElementById("beautified"), {
+        lineNumbers: true,
+        matchBrackets: false,
+        lineWrapping: true,
+        readOnly: true,
+        tabSize: 8
+    });
+
     format();
 };
 
