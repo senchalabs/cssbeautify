@@ -24,6 +24,10 @@ function format() {
             options.openbrace = 'separate-line';
         }
 
+        if (document.getElementById('autosemicolon').checked) {
+            options.autosemicolon = true;
+        }
+
         if (typeof editor === undefined) {
             raw = document.getElementById('raw').value;
         } else {
