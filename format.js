@@ -16,6 +16,8 @@ function format() {
 
         if (document.getElementById('tab').checked) {
             options.indent = '\t';
+        } else if (document.getElementById('twospaces').checked) {
+            options.indent = '  ';
         }
 
         if (document.getElementById('openbrace-separate-line').checked) {
