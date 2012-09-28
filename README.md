@@ -33,12 +33,14 @@ The API is very simple:
 
   *  <code>indent</code> is a string used for the indentation of the declaration (default is 4 spaces)
   *  <code>openbrace</code> defines the placement of open curly brace, either *end-of-line* (default) or *separate-line*.
+  *  <code>autosemicolon</code> always inserts semicolon after the last ruleset (default is *false*)
 
 Example call:
 
     var beautified = cssbeautify('menu{opacity:.7}', {
         indent: '  ',
-        openbrace: 'separate-line'
+        openbrace: 'separate-line',
+        autosemicolon: true
     });
 
 ## Contributing ##

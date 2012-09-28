@@ -35,6 +35,7 @@
         var options, index = 0, length = style.length, blocks, formatted = '',
             ch, ch2, str, state, State, depth, quote, comment,
             openbracesuffix = true,
+            autosemicolon = false,
             trimRight;
 
         options = arguments.length > 1 ? opt : {};
@@ -43,6 +44,9 @@
         }
         if (typeof options.openbrace === 'string') {
             openbracesuffix = (options.openbrace === 'end-of-line');
+        }
+        if (typeof options.autosemicolon === 'boolean') {
+            autosemicolon = options.autosemicolon;
         }
 
         function isWhitespace(c) {
@@ -86,6 +90,13 @@
         function closeBlock() {
             depth -= 1;
             formatted = trimRight(formatted);
+
+            if (autosemicolon) {
+                if (formatted.charAt(formatted.length - 1) !== ';') {
+                    formatted += ';';
+                }
+            }
+
             formatted += '\n';
             appendIndent();
             formatted += '}';

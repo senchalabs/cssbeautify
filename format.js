@@ -1,4 +1,4 @@
-/*global cssbeautify:true, document:true, window:true */
+/*global cssbeautify:true, document:true, window:true, CodeMirror: true */
 
 var editor, viewer, formatId;
 
@@ -16,13 +16,19 @@ function format() {
 
         if (document.getElementById('tab').checked) {
             options.indent = '\t';
+        } else if (document.getElementById('twospaces').checked) {
+            options.indent = '  ';
         }
 
         if (document.getElementById('openbrace-separate-line').checked) {
             options.openbrace = 'separate-line';
         }
 
-        if (typeof editor === 'undefined') {
+        if (document.getElementById('autosemicolon').checked) {
+            options.autosemicolon = true;
+        }
+
+        if (typeof editor === undefined) {
             raw = document.getElementById('raw').value;
         } else {
             raw = editor.getValue();
@@ -30,7 +36,7 @@ function format() {
 
         beautified = cssbeautify(raw, options);
 
-        if (typeof viewer === 'undefined') {
+        if (typeof viewer === undefined) {
             document.getElementById('beautified').value = beautified;
         } else {
             viewer.setValue(beautified);
