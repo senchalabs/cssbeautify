@@ -1,4 +1,4 @@
-/*global cssbeautify:true, document:true, window:true */
+/*global cssbeautify:true, document:true, window:true, CodeMirror: true */
 
 var editor, viewer, formatId;
 
@@ -24,7 +24,7 @@ function format() {
             options.openbrace = 'separate-line';
         }
 
-        if (typeof editor === 'undefined') {
+        if (typeof editor === undefined) {
             raw = document.getElementById('raw').value;
         } else {
             raw = editor.getValue();
@@ -32,7 +32,7 @@ function format() {
 
         beautified = cssbeautify(raw, options);
 
-        if (typeof viewer === 'undefined') {
+        if (typeof viewer === undefined) {
             document.getElementById('beautified').value = beautified;
         } else {
             viewer.setValue(beautified);
