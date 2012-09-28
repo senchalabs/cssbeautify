@@ -91,7 +91,7 @@
             depth -= 1;
             formatted = trimRight(formatted);
 
-            if (autosemicolon) {
+            if (autosemicolon && formatted.length > 0) {
                 if (formatted.charAt(formatted.length - 1) !== ';') {
                     formatted += ';';
                 }
