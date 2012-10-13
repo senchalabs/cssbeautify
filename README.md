@@ -12,7 +12,7 @@ CSS Beautify will produce:
     menu {
         color: red
     }
-    
+
     navigation {
         background-color: #333
     }
@@ -33,7 +33,7 @@ The API is very simple:
 
   *  <code>indent</code> is a string used for the indentation of the declaration (default is 4 spaces)
   *  <code>openbrace</code> defines the placement of open curly brace, either *end-of-line* (default) or *separate-line*.
-  *  <code>autosemicolon</code> always inserts semicolon after the last ruleset (default is *false*)
+  *  <code>autosemicolon</code> always inserts a semicolon after the last ruleset (default is *false*)
 
 Example call:
 
@@ -45,20 +45,11 @@ Example call:
 
 ## Contributing ##
 
-Before we can accept any contributions, you need to sign [Contributor License Agreement](http://en.wikipedia.org/wiki/Contributor_License_Agreement). You can do that using Sencha Labs [online CLA](http://www.sencha.com/cla).
-
-For the actual contribution, please use [Github pull request](http://help.github.com/pull-requests/) workflow.
-
-Please do not create a pull request for multiple unrelated commits. It is strongly recommended to create a topic branch and make the commits as atomic as possible for the merge. This makes it easy to review all the changes.
-
-Make sure that your code passes [JSLint](http://jslint.com) checks.
-
-Make sure your patch does break existing tests (open <code>test.htm</code> in a web browser).
-
-If you add a new feature, create a new test associated with that. Feature or enhancement pull request without a corresponding test will **not** be merged.
+Contributions are welcomed! Please read the [Contribution Guide](https://github.com/senchalabs/cssbeautify/CONTRIBUTING.md) for more info.
 
 ## License ##
 
+Copyright (C) 2012 Sencha Inc.
 Copyright (C) 2011 Sencha Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
