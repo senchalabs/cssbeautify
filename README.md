@@ -45,7 +45,7 @@ Example call:
 
 ## Contributing ##
 
-Contributions are welcomed! Please read the [Contribution Guide](https://github.com/senchalabs/cssbeautify/CONTRIBUTING.md) for more info.
+Contributions are welcomed! Please read the [Contribution Guide](https://github.com/senchalabs/cssbeautify/blob/master/CONTRIBUTING.md) for more info.
 
 ## License ##
 
