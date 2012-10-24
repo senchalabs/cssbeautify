@@ -4,18 +4,21 @@ CSS Beautify is a JavaScript implementation of reindenter and reformatter for st
 
 Given the following style:
 
-    menu{color:red} navigation{background-color:#333}
-
+```css
+menu{color:red} navigation{background-color:#333}
+```
 
 CSS Beautify will produce:
 
-    menu {
-        color: red
-    }
+```css
+menu {
+    color: red
+}
 
-    navigation {
-        background-color: #333
-    }
+navigation {
+    background-color: #333
+}
+```
 
 Try it online at [cssbeautify.com](http://cssbeautify.com).
 
@@ -27,7 +30,9 @@ Since CSS Beautify is written in pure JavaScript, it can run anywhere that JavaS
 
 The API is very simple:
 
-    var result = cssbeautify(style, options);
+```javascript
+var result = cssbeautify(style, options);
+```
 
 **options** is an optional object to adjust the formatting. Known options so far are:
 
@@ -37,11 +42,13 @@ The API is very simple:
 
 Example call:
 
-    var beautified = cssbeautify('menu{opacity:.7}', {
-        indent: '  ',
-        openbrace: 'separate-line',
-        autosemicolon: true
-    });
+```javascript
+var beautified = cssbeautify('menu{opacity:.7}', {
+    indent: '  ',
+    openbrace: 'separate-line',
+    autosemicolon: true
+});
+```
 
 ## Contributing ##
 
