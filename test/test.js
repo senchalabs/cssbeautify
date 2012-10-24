@@ -52,6 +52,260 @@ var tests = {
             '    color: red',
             '}'
         ]
+    },
+
+    'Block comment': {
+        input: [
+            '/* line comment */',
+            'navigation { color: blue }',
+            '',
+            'menu {',
+            '    /* line comment inside */',
+            '    border: 2px',
+            '}',
+            '',
+            '/* block',
+            ' comment */',
+            'sidebar { color: red }',
+            '',
+            'invisible {',
+            '    /* block',
+            '     * comment',
+            '     * inside */',
+            '    color: #eee',
+            '}'
+        ],
+        expected: [
+            '/* line comment */',
+            'navigation {',
+            '    color: blue',
+            '}',
+            '',
+            'menu {',
+            '    /* line comment inside */',
+            '    border: 2px',
+            '}',
+            '',
+            '/* block',
+            ' comment */',
+            'sidebar {',
+            '    color: red',
+            '}',
+            '',
+            'invisible {',
+            '    /* block',
+            '     * comment',
+            '     * inside */',
+            '    color: #eee',
+            '}'
+        ]
+    },
+
+    'Indentation': {
+        input: [
+            '     navigation {',
+            '    color: blue',
+            '  }'
+        ],
+        expected: [
+            'navigation {',
+            '    color: blue',
+            '}'
+        ]
+    },
+
+    'Blank lines and spaces': {
+        input: [
+            '/* only one blank line between */',
+            'menu { color: red }',
+            '',
+            '',
+            '',
+            '',
+            'navi { color: black }',
+            '',
+            '/* automatically insert a blank line */',
+            'button { border: 1px } sidebar { color: #ffe }',
+            '',
+            '/* always whitespace before { */',
+            'hidden{opacity:0%}',
+            '',
+            '/* no blank lines inside ruleset */',
+            'imprint {',
+            '  color: blue;',
+            '',
+            '',
+            '    opacity: 0.5;',
+            '',
+            '   font-size: small',
+            '}',
+            '',
+            '/* before colon: no space, after colon: one space only */',
+            'footer {',
+            '      font-family:     Arial;',
+            '',
+            '  float   :right;',
+            '  }'
+        ],
+        expected: [
+            '/* only one blank line between */',
+            'menu {',
+            '    color: red',
+            '}',
+            '',
+            'navi {',
+            '    color: black',
+            '}',
+            '',
+            '/* automatically insert a blank line */',
+            'button {',
+            '    border: 1px',
+            '}',
+            '',
+            'sidebar {',
+            '    color: #ffe',
+            '}',
+            '',
+            '/* always whitespace before { */',
+            'hidden {',
+            '    opacity: 0%',
+            '}',
+            '',
+            '/* no blank lines inside ruleset */',
+            'imprint {',
+            '    color: blue;',
+            '    opacity: 0.5;',
+            '    font-size: small',
+            '}',
+            '',
+            '/* before colon: no space, after colon: one space only */',
+            'footer {',
+            '    font-family: Arial;',
+            '    float: right;',
+            '}'
+        ]
+    },
+
+    'Quoted string': {
+        input: [
+            'nav:after{content:\'}\'}',
+            'nav:before{content:"}"}'
+        ],
+        expected: [
+            'nav:after {',
+            '    content: \'}\'',
+            '}',
+            '',
+            'nav:before {',
+            '    content: "}"',
+            '}',
+        ]
+    },
+
+    'Selectors': {
+        input: [
+            '* { border: 0px solid blue; }',
+            'div[class="{}"] { color: red; }',
+            'a[id=\\"foo"] { padding: 0; }',
+            '#menu, #nav, #footer { color: royalblue; }'
+        ],
+        expected: [
+            '* {',
+            '    border: 0px solid blue;',
+            '}',
+            '',
+            'div[class="{}"] {',
+            '    color: red;',
+            '}',
+            '',
+            'a[id=\\"foo"] {',
+            '    padding: 0;',
+            '}',
+            '',
+            '#menu, #nav, #footer {',
+            '    color: royalblue;',
+            '}'
+        ]
+    },
+
+    '@import directive': {
+        input: [
+            'menu{background-color:red} @import url(\'foobar.css\') screen;',
+            'nav{margin:0}'
+        ],
+        expected: [
+            'menu {',
+            '    background-color: red',
+            '}',
+            '',
+            '@import url(\'foobar.css\') screen;',
+            '',
+            'nav {',
+            '    margin: 0',
+            '}'
+        ]
+    },
+
+    '@media directive': {
+        input: [
+            '@import "subs.css";',
+            '@import "print-main.css" print;',
+            '@media print {',
+            '  body { font-size: 10pt }',
+            '  nav { color: blue; }',
+            '}',
+            'h1 {color: red; }'
+        ],
+        expected: [
+            '@import "subs.css";',
+            '',
+            '@import "print-main.css" print;',
+            '',
+            '@media print {',
+            '    body {',
+            '        font-size: 10pt',
+            '    }',
+            '',
+            '    nav {',
+            '        color: blue;',
+            '    }',
+            '}',
+            '',
+            'h1 {',
+            '    color: red;',
+            '}'
+        ]
+    },
+
+    'URL': {
+        input: [
+            'menu { background-image: url(data:image/png;base64,AAAAAAA); }'
+        ],
+        expected: [
+            'menu {',
+            '    background-image: url(data:image/png;base64,AAAAAAA);',
+            '}'
+        ]
+    },
+
+    'Animation keyframe': {
+        input: [
+            '@-webkit-keyframes anim {',
+            '0% { -webkit-transform: translate3d(0px, 0px, 0px); }',
+            '100% { -webkit-transform: translate3d(150px, 0px, 0px) }}'
+        ],
+        expected: [
+            '@-webkit-keyframes anim {',
+            '    0% {',
+            '        -webkit-transform: translate3d(0px, 0px, 0px);',
+            '    }',
+            '',
+            '    100% {',
+            '        -webkit-transform: translate3d(150px, 0px, 0px)',
+            '    }',
+            '}'
+        ]
     }
+
 };
 

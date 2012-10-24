@@ -19,7 +19,7 @@ CSS Beautify will produce:
 
 Try it online at [cssbeautify.com](http://cssbeautify.com).
 
-For more examples, see also its [test suite](http://cssbeautify.com/test.htm).
+For more examples, see also its [test suite](http://cssbeautify.com/test/).
 
 ## Using cssbeautify() function ##
 

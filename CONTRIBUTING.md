@@ -12,7 +12,7 @@ Before we can accept any contributions, you need to sign [Contributor License Ag
 
 Make sure that your code passes [JSLint](http://jslint.com) checks.
 
-Make sure your patch does break existing tests (open <code>test.htm</code> in a web browser).
+Make sure your patch does break existing tests (open <code>test/index.html</code> in a web browser).
 
 If you add a new feature, create a new test associated with that. Feature or enhancement pull request without a corresponding test will **not** be merged.
 
