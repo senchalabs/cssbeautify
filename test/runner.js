@@ -22,8 +22,14 @@
  THE SOFTWARE.
 */
 
-/*jslint browser:true */
+/*jslint browser:true node:true */
 /*global cssbeautify:true, tests:true */
+
+var cssbeautify;
+
+if (typeof require === 'function') {
+    cssbeautify = require('../cssbeautify');
+}
 
 function runTest(name, input, expected, options, reporter) {
     'use strict';
@@ -45,11 +51,25 @@ function runTest(name, input, expected, options, reporter) {
     }
 }
 
+function runTests(reporter) {
+    'use strict';
+    var i, entry, options, input, expected;
+
+    for (i in tests) {
+        if (tests.hasOwnProperty(i)) {
+            entry = tests[i];
+            options = entry.options || {};
+            input = entry.input;
+            expected = entry.expected;
+            runTest(i, input, expected, options, reporter);
+        }
+    }
+}
+
 function executeBrowser() {
     'use strict';
-    var reporter, i, entry, input, expected, options;
 
-    reporter = {
+    runTests({
         reportSuccess: function (name, input, actual) {
             var e;
 
@@ -100,16 +120,40 @@ function executeBrowser() {
             e.setAttribute('class', 'result');
             document.getElementById('result').appendChild(e);
         }
-    };
-
-    for (i in tests) {
-        if (tests.hasOwnProperty(i)) {
-            entry = tests[i];
-            options = entry.options || {};
-            input = entry.input;
-            expected = entry.expected;
-            runTest(i, input, expected, options, reporter);
-        }
-    }
+    });
 }
 
+function executeCommandLine() {
+    'use strict';
+
+    var vm = require('vm'),
+        fs = require('fs');
+
+    vm.runInThisContext(fs.readFileSync(__dirname + '/test.js', 'utf-8'));
+
+    runTests({
+        reportSuccess: function (name, input, actual) {
+            console.log('Testing', name, 'OK');
+        },
+
+        reportFailure: function (name, input, actual, expected) {
+            console.log('Testing', name, 'FAILED');
+            console.log();
+            console.log('Style:');
+            console.log(input);
+            console.log();
+            console.log('Expected:');
+            console.log(expected);
+            console.log();
+            console.log('Actual:');
+            console.log(actual);
+            console.log();
+            console.log();
+        }
+    });
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    executeCommandLine();
+    console.log();
+}
