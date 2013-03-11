@@ -63,7 +63,7 @@
             return (ch >= 'a' && ch <= 'z') ||
                 (ch >= 'A' && ch <= 'Z') ||
                 (ch >= '0' && ch <= '9') ||
-                '-_*.:#'.indexOf(c) >= 0;
+                '-_*.:#[]'.indexOf(c) >= 0;
         }
 
         function appendIndent() {
@@ -198,7 +198,7 @@
                 }
 
                 // Selector or at-rule
-                if (isName(ch) || (ch === '[') || (ch === '@')) {
+                if (isName(ch) || (ch === '@')) {
 
                     // Clear trailing whitespaces and linefeeds.
                     str = trimRight(formatted);
