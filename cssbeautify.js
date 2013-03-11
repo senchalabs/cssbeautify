@@ -1,4 +1,5 @@
 /*
+ Copyright (C) 2013 Sencha Inc.
  Copyright (C) 2012 Sencha Inc.
  Copyright (C) 2011 Sencha Inc.
 
@@ -88,11 +89,13 @@
         }
 
         function closeBlock() {
+            var ch;
             depth -= 1;
             formatted = trimRight(formatted);
 
-            if (autosemicolon && formatted.length > 0) {
-                if (formatted.charAt(formatted.length - 1) !== ';') {
+            if (autosemicolon) {
+                ch = formatted.charAt(formatted.length - 1);
+                if (ch !== ';' && ch !== '{') {
                     formatted += ';';
                 }
             }
@@ -196,7 +199,7 @@
                 }
 
                 // Selector or at-rule
-                if (isName(ch) || (ch === '@')) {
+                if (isName(ch) || (ch === '[') || (ch === '@')) {
 
                     // Clear trailing whitespaces and linefeeds.
                     str = trimRight(formatted);
