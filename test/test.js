@@ -247,6 +247,21 @@ var tests = {
         ]
     },
 
+    '@font-face directive': {
+        input: [
+            '@font-face{ color:     black; background-color:blue}'
+        ],
+        options: {
+            autosemicolon: true
+        },
+        expected: [
+            '@font-face {',
+            '    color: black;',
+            '    background-color: blue;',
+            '}'
+        ]
+    },
+
     '@import directive': {
         input: [
             'menu{background-color:red} @import url(\'foobar.css\') screen;',

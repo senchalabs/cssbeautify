@@ -247,8 +247,9 @@
 
                 // '{' starts a block
                 if (ch === '{') {
+                    str = trimRight(formatted);
                     openBlock();
-                    state = State.Block;
+                    state = (str === '@font-face') ? State.Ruleset : State.Block;
                     continue;
                 }
 
