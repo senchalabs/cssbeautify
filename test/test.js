@@ -208,6 +208,7 @@ var tests = {
             '* { border: 0px solid blue; }',
             'div[class="{}"] { color: red; }',
             'a[id=\\"foo"] { padding: 0; }',
+            '[id=\\"foo"] { margin: 0; }',
             '#menu, #nav, #footer { color: royalblue; }'
         ],
         expected: [
@@ -221,6 +222,10 @@ var tests = {
             '',
             'a[id=\\"foo"] {',
             '    padding: 0;',
+            '}',
+            '',
+            '[id=\\"foo"] {',
+            '    margin: 0;',
             '}',
             '',
             '#menu, #nav, #footer {',

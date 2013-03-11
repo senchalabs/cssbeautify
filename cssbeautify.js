@@ -199,7 +199,7 @@
                 }
 
                 // Selector or at-rule
-                if (isName(ch) || (ch === '@')) {
+                if (isName(ch) || (ch === '[') || (ch === '@')) {
 
                     // Clear trailing whitespaces and linefeeds.
                     str = trimRight(formatted);
