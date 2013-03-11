@@ -1,4 +1,5 @@
 /*
+ Copyright (C) 2013 Sencha Inc.
  Copyright (C) 2012 Sencha Inc.
  Copyright (C) 2011 Sencha Inc.
 
@@ -224,6 +225,19 @@ var tests = {
             '',
             '#menu, #nav, #footer {',
             '    color: royalblue;',
+            '}'
+        ]
+    },
+
+    'Empty rule': {
+        input: [
+            'menu{}'
+        ],
+        options: {
+            autosemicolon: true
+        },
+        expected: [
+            'menu {',
             '}'
         ]
     },
