@@ -89,13 +89,13 @@
         }
 
         function closeBlock() {
-            var ch;
+            var last;
             depth -= 1;
             formatted = trimRight(formatted);
 
-            if (autosemicolon) {
-                ch = formatted.charAt(formatted.length - 1);
-                if (ch !== ';' && ch !== '{') {
+            if (formatted.length > 0 && autosemicolon) {
+                last = formatted.charAt(formatted.length - 1);
+                if (last !== ';' && last !== '{') {
                     formatted += ';';
                 }
             }
@@ -173,14 +173,13 @@
                     index += 1;
                 }
                 continue;
-            } else {
-                if (ch === '/' && ch2 === '*') {
-                    comment = true;
-                    formatted += ch;
-                    formatted += ch2;
-                    index += 1;
-                    continue;
-                }
+            }
+            if (ch === '/' && ch2 === '*') {
+                comment = true;
+                formatted += ch;
+                formatted += ch2;
+                index += 1;
+                continue;
             }
 
             if (state === State.Start) {
