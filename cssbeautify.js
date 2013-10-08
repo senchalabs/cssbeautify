@@ -89,13 +89,13 @@
         }
 
         function closeBlock() {
-            var ch;
+            var last;
             depth -= 1;
             formatted = trimRight(formatted);
 
             if (formatted.length > 0 && autosemicolon) {
-                ch = formatted.charAt(formatted.length - 1);
-                if (ch !== ';' && ch !== '{') {
+                last = formatted.charAt(formatted.length - 1);
+                if (last !== ';' && last !== '{') {
                     formatted += ';';
                 }
             }
