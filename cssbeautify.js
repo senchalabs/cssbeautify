@@ -93,7 +93,7 @@
             depth -= 1;
             formatted = trimRight(formatted);
 
-            if (autosemicolon) {
+            if (formatted.length > 0 && autosemicolon) {
                 ch = formatted.charAt(formatted.length - 1);
                 if (ch !== ';' && ch !== '{') {
                     formatted += ';';
