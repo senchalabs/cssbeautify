@@ -173,14 +173,13 @@
                     index += 1;
                 }
                 continue;
-            } else {
-                if (ch === '/' && ch2 === '*') {
-                    comment = true;
-                    formatted += ch;
-                    formatted += ch2;
-                    index += 1;
-                    continue;
-                }
+            }
+            if (ch === '/' && ch2 === '*') {
+                comment = true;
+                formatted += ch;
+                formatted += ch2;
+                index += 1;
+                continue;
             }
 
             if (state === State.Start) {
